@@ -13,10 +13,12 @@ pub fn parse_vm_args(args: &[String]) -> Result<VmArgsParsed, VmArgsError> {
         }
         if let Some(value) = arg.strip_prefix("--allow-caps=") {
             add_caps(value, &mut config.allowed_caps, arg)?;
+            apply_caps_to_capabilities(value, &mut config.capabilities, true)?;
             continue;
         }
         if let Some(value) = arg.strip_prefix("--deny-caps=") {
             add_caps(value, &mut config.denied_caps, arg)?;
+            apply_caps_to_capabilities(value, &mut config.capabilities, false)?;
             continue;
         }
         if let Some(value) = arg.strip_prefix("-ae.") {
@@ -105,6 +107,26 @@ fn add_caps(
             });
         }
         caps.insert(trimmed.to_string());
+    }
+    Ok(())
+}
+
+fn apply_caps_to_capabilities(
+    value: &str,
+    capabilities: &mut super::super::config::VMCapabilities,
+    enable: bool,
+) -> Result<(), VmArgsError> {
+    for cap in value.split(',') {
+        let trimmed = cap.trim();
+        match trimmed {
+            "fs" => capabilities.allow_fs = enable,
+            "net" => capabilities.allow_net = enable,
+            "exec" => capabilities.allow_exec = enable,
+            _ => {
+                // unknown capability names are silently ignored for forward compatibility
+                // they're still added to allowed_caps/denied_caps for native modules
+            }
+        }
     }
     Ok(())
 }

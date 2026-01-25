@@ -1,6 +1,6 @@
 [package]
 name = "aelys-backend"
-version = "0.17.6-a"
+version = "0.17.8-a"
 edition = "2024"
 
 [dependencies]

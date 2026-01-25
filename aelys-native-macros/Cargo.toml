@@ -1,6 +1,6 @@
 [package]
 name = "aelys-native-macros"
-version = "0.1.0"
+version = "0.17.8-a"
 edition = "2024"
 
 [lib]

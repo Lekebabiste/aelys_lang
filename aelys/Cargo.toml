@@ -1,6 +1,6 @@
 [package]
 name = "aelys"
-version = "0.17.6-a"
+version = "0.17.8-a"
 edition = "2024"
 
 [dependencies]
@@ -19,3 +19,7 @@ aelys-driver = { path = "../aelys-driver" }
 tempfile = "3"
 aelys-opt = { path = "../aelys-opt" }
 aelys-bytecode = { path = "../aelys-bytecode" }
+
+[build-dependencies]
+regex = "1"
+toml_edit = "0.22"

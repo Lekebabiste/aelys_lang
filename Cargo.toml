@@ -17,6 +17,9 @@ members = [
     "aelys-native-macros",
 ]
 
+[workspace.package]
+version = "0.17.8-a"
+
 [profile.release]
 lto = "fat"
 codegen-units = 1

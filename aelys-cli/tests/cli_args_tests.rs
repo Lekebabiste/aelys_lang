@@ -147,3 +147,52 @@ fn parse_version_command() {
         }
     );
 }
+
+#[test]
+fn parse_allow_caps_with_equals() {
+    let args = vec!["aelys", "--allow-caps=fs,net", "main.aelys"]
+        .into_iter()
+        .map(|s| s.to_string())
+        .collect::<Vec<_>>();
+
+    let parsed = parse_args(&args).unwrap();
+
+    assert!(parsed.vm_args.contains(&"--allow-caps=fs,net".to_string()));
+}
+
+#[test]
+fn parse_allow_caps_with_space() {
+    let args = vec!["aelys", "--allow-caps", "fs,net", "main.aelys"]
+        .into_iter()
+        .map(|s| s.to_string())
+        .collect::<Vec<_>>();
+
+    let parsed = parse_args(&args).unwrap();
+
+    assert!(parsed.vm_args.contains(&"--allow-caps=fs,net".to_string()));
+}
+
+#[test]
+fn parse_deny_caps_with_equals() {
+    let args = vec!["aelys", "--deny-caps=exec", "main.aelys"]
+        .into_iter()
+        .map(|s| s.to_string())
+        .collect::<Vec<_>>();
+
+    let parsed = parse_args(&args).unwrap();
+
+    assert!(parsed.vm_args.contains(&"--deny-caps=exec".to_string()));
+}
+
+#[test]
+fn parse_deny_caps_with_space() {
+    let args = vec!["aelys", "--deny-caps", "exec", "main.aelys"]
+        .into_iter()
+        .map(|s| s.to_string())
+        .collect::<Vec<_>>();
+
+    let parsed = parse_args(&args).unwrap();
+
+    assert!(parsed.vm_args.contains(&"--deny-caps=exec".to_string()));
+}
+

@@ -166,7 +166,9 @@ impl<'a> AasmParser<'a> {
             "ExitNoGc" => encode_a(OpCode::ExitNoGc, 0, 0, 0),
             "Alloc" => {
                 let a = self.parse_register()?;
-                encode_a(OpCode::Alloc, a, 0, 0)
+                self.skip_comma()?;
+                let b = self.parse_register()?;
+                encode_a(OpCode::Alloc, a, b, 0)
             }
             "Free" => {
                 let a = self.parse_register()?;
@@ -176,7 +178,9 @@ impl<'a> AasmParser<'a> {
                 let a = self.parse_register()?;
                 self.skip_comma()?;
                 let b = self.parse_register()?;
-                encode_a(OpCode::LoadMem, a, b, 0)
+                self.skip_comma()?;
+                let c = self.parse_register()?;
+                encode_a(OpCode::LoadMem, a, b, c)
             }
             "LoadMemI" => {
                 let a = self.parse_register()?;
@@ -190,7 +194,9 @@ impl<'a> AasmParser<'a> {
                 let a = self.parse_register()?;
                 self.skip_comma()?;
                 let b = self.parse_register()?;
-                encode_a(OpCode::StoreMem, a, b, 0)
+                self.skip_comma()?;
+                let c = self.parse_register()?;
+                encode_a(OpCode::StoreMem, a, b, c)
             }
             "StoreMemI" => {
                 let a = self.parse_register()?;

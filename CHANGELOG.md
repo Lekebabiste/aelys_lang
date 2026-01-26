@@ -4,6 +4,9 @@ All notable changes to Aelys, roughly grouped by version. I don't always tag rel
 
 ## 0.18.x (Current)
 
+**0.18.2-a**
+- Fixed assembler/runtime mismatch for memory opcodes (Alloc, LoadMem, StoreMem)
+
 **0.18.1-a**
 - Fixed register index overflow in loop instruction verification (ForLoopI, WhileLoopLt)
 - Fixed globals sync ignoring null values (caused inconsistency between indexed/named access)

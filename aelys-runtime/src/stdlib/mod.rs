@@ -4,6 +4,7 @@ pub mod io;
 pub mod math;
 pub mod net;
 pub mod string;
+pub mod bytes;
 pub mod sys;
 pub mod time;
 
@@ -20,6 +21,7 @@ pub enum Resource {
     TcpStream(TcpStreamResource),
     TcpListener(TcpListener),
     Timer(Instant),
+    ByteBuffer(ByteBuffer),
 }
 
 #[derive(Debug)]
@@ -44,6 +46,11 @@ pub struct TcpStreamResource {
     pub timeout_ms: Option<u64>,
 }
 
+#[derive(Debug)]
+pub struct ByteBuffer {
+    pub data: Vec<u8>,
+}
+
 pub const STD_MODULES: &[&str] = &[
     "std.math",
     "std.io",
@@ -53,6 +60,7 @@ pub const STD_MODULES: &[&str] = &[
     "std.string",
     "std.convert",
     "std.sys",
+    "std.bytes",
 ];
 
 pub fn is_std_module(path: &[String]) -> bool {
@@ -108,6 +116,7 @@ pub fn register_std_module(
         "string" => string::register(vm),
         "convert" => convert::register(vm),
         "sys" => sys::register(vm),
+        "bytes" => bytes::register(vm),
         _ => Err(
             vm.runtime_error(RuntimeErrorKind::UndefinedVariable(format!(
                 "std.{}",

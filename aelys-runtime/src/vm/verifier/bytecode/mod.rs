@@ -16,6 +16,23 @@ pub(super) fn verify_bytecode(func: &Function) -> Result<(), String> {
     let upvalues_len = func.upvalue_descriptors.len();
     let bytecode = &func.bytecode;
 
+    // security: Validate function size limits to prevent integer truncation
+    // when caching bytecode_len as u32 and constants_len as u16 in CallSiteCacheEntry
+    if bytecode.len() > u32::MAX as usize {
+        return Err(format!(
+            "bytecode length {} exceeds maximum {} (u32::MAX)",
+            bytecode.len(),
+            u32::MAX
+        ));
+    }
+    if constants_len > u16::MAX as usize {
+        return Err(format!(
+            "constants length {} exceeds maximum {} (u16::MAX)",
+            constants_len,
+            u16::MAX
+        ));
+    }
+
     for (ip, instr) in bytecode.iter().enumerate() {
         let opcode_byte = (instr >> 24) as u8;
         let opcode = OpCode::from_u8(opcode_byte)
@@ -38,7 +55,7 @@ pub(super) fn verify_bytecode(func: &Function) -> Result<(), String> {
         if memory::verify(opcode, a, b, c, num_regs)? {
             continue;
         }
-        if globals::verify(opcode, a, b, c, imm, num_regs, constants_len)? {
+        if globals::verify(opcode, ip, a, b, c, imm, num_regs, constants_len, bytecode.len())? {
             continue;
         }
         if calls::verify(opcode, a, b, c, num_regs, upvalues_len)? {

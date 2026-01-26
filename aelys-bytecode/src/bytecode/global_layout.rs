@@ -19,7 +19,7 @@ impl GlobalLayout {
             return Self::empty();
         }
         let cache = GLOBAL_LAYOUT_CACHE.get_or_init(|| Mutex::new(HashMap::new()));
-        let mut guard = cache.lock().unwrap();
+        let mut guard = cache.lock().unwrap_or_else(|e| e.into_inner());
         if let Some(existing) = guard.get(&names) {
             return Arc::clone(existing);
         }

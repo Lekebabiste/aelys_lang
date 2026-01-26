@@ -4,6 +4,25 @@ All notable changes to Aelys, roughly grouped by version. I don't always tag rel
 
 ## 0.17.x (Current)
 
+**0.17.10-a**
+- Fixed use-after-move error in module compiler (`compile.rs`)
+- top-level if-expressions with else now return values instead of null
+- top-level blocks now return the value of their last expression
+
+**0.17.9-a**
+- Fixed critical call site cache corruption in multi-module programs (slot_id collision)
+- Global call site slot allocation across module boundaries
+- Removed unused `global_cache` field (dead code cleanup)
+- Automated version synchronization
+
+**0.17.8-a**
+- Fixed `--allow-caps` and `--deny-caps` flags not actually enabling/disabling VM capabilities
+- Added comprehensive tests for capability flags
+
+**0.17.7-a**
+- Add support for && and || syntax
+- Add 360 new test for stdlib
+
 **0.17.6-a**
 - Direct opcodes for `alloc`/`free`/`load`/`store` (~45% faster)
 - Fixed disassembler output for memory opcodes

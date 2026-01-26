@@ -107,11 +107,15 @@ match opcode_byte {
     39 => {
         let (a, imm) = decode_aimm(instr);
         let idx = imm as u16 as usize;
-        if idx < self.globals_by_index.len() {
-            let val = self.globals_by_index[idx];
-            if let Some(n) = val.as_int() {
-                self.set_global_by_index(idx, Value::int(n.wrapping_add(a as i64)));
-            }
+        if idx >= self.globals_by_index.len() {
+            self.frames[current_frame_idx].ip = ip;
+            return Err(self.runtime_error(RuntimeErrorKind::InvalidBytecode(
+                format!("IncGlobalI index {} out of bounds (max: {})", idx, self.globals_by_index.len()),
+            )));
+        }
+        let val = self.globals_by_index[idx];
+        if let Some(n) = val.as_int() {
+            self.set_global_by_index(idx, Value::int(n.wrapping_add(a as i64)));
         }
     }
 

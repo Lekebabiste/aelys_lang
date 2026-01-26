@@ -4,6 +4,10 @@ All notable changes to Aelys, roughly grouped by version. I don't always tag rel
 
 ## 0.18.x (Current)
 
+**0.18.5-a**
+- Fixed mutex poison panic in GlobalLayout cache
+- Fixed IncGlobalI silently ignoring out-of-bounds index
+
 **0.18.4-a**
 - Fixed auto-semicolon breaking `if { } else { }` on separate lines
 

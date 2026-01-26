@@ -1,25 +1,32 @@
 //! Common test utilities for Aelys tests
 #![allow(dead_code)]
 
-use aelys::run;
+use aelys::{new_vm, run_with_vm_and_opt};
+use aelys_opt::OptimizationLevel;
 use aelys_runtime::Value;
 
 /// Run Aelys source code and return the result value.
 /// Panics on compilation or runtime errors.
+/// Supports module imports (needs std.X).
 pub fn run_aelys(source: &str) -> Value {
-    run(source, "<test>").expect("Aelys execution should succeed")
+    let mut vm = new_vm().expect("Failed to create VM");
+    run_with_vm_and_opt(&mut vm, source, "<test>", OptimizationLevel::Standard)
+        .expect("Aelys execution should succeed")
 }
 
 /// Run Aelys source code and expect it to succeed.
 /// Returns the Value result.
 pub fn run_aelys_ok(source: &str) -> Value {
-    run(source, "<test>").expect("Expected success but got error")
+    let mut vm = new_vm().expect("Failed to create VM");
+    run_with_vm_and_opt(&mut vm, source, "<test>", OptimizationLevel::Standard)
+        .expect("Expected success but got error")
 }
 
 /// Run Aelys source code and expect it to fail.
 /// Returns the error message.
 pub fn run_aelys_err(source: &str) -> String {
-    match run(source, "<test>") {
+    let mut vm = new_vm().expect("Failed to create VM");
+    match run_with_vm_and_opt(&mut vm, source, "<test>", OptimizationLevel::Standard) {
         Ok(v) => panic!("Expected error but got success: {:?}", v),
         Err(e) => e.to_string(),
     }
@@ -64,4 +71,12 @@ pub fn assert_aelys_error_contains(source: &str, expected_substring: &str) {
         expected_substring,
         err
     );
+}
+
+/// Run Aelys source code, allowing both success and error.
+/// Returns Ok(Value) on success, Err(String) on error.
+pub fn run_aelys_result(source: &str) -> Result<Value, String> {
+    let mut vm = new_vm().expect("Failed to create VM");
+    run_with_vm_and_opt(&mut vm, source, "<test>", OptimizationLevel::Standard)
+        .map_err(|e| e.to_string())
 }

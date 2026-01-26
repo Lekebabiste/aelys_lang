@@ -74,5 +74,5 @@ impl From<Arc<[u32]>> for BytecodeBuffer {
     }
 }
 
-unsafe impl Send for BytecodeBuffer {}
-unsafe impl Sync for BytecodeBuffer {}
+// NOTE: intentionally NOT Send/Sync due to UnsafeCell patching.
+// Use AtomicU32 if multi-threading is ever needed.

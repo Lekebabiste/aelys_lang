@@ -1,5 +1,6 @@
 // disassembly for debugging bytecode
 
+use crate::cli::vm_config::parse_vm_args_or_error;
 use aelys_backend::Compiler;
 use aelys_bytecode::asm::{deserialize_with_manifest, disassemble_to_string};
 use aelys_driver::modules::load_modules_with_loader;
@@ -12,7 +13,7 @@ use std::path::{Path, PathBuf};
 
 #[allow(dead_code)]
 pub fn asm_transform(path: &Path) -> Result<PathBuf, String> {
-    match asm_transform_with_options(path, None, false, OptimizationLevel::Standard)? {
+    match asm_transform_with_options(path, None, false, OptimizationLevel::Standard, VmConfig::default())? {
         Some(path) => Ok(path),
         None => Err("no output produced".to_string()),
     }
@@ -23,9 +24,13 @@ pub fn run_with_options(
     output: Option<String>,
     stdout: bool,
     opt_level: OptimizationLevel,
+    vm_args: Vec<String>,
 ) -> Result<i32, String> {
+    let parsed = parse_vm_args_or_error(&vm_args)?;
+    let config = parsed.config;
+
     let output_path = output.map(PathBuf::from);
-    let output = asm_transform_with_options(Path::new(path), output_path, stdout, opt_level)?;
+    let output = asm_transform_with_options(Path::new(path), output_path, stdout, opt_level, config)?;
     if let Some(path) = output {
         eprintln!("Wrote {}", path.display());
     }
@@ -37,6 +42,7 @@ fn asm_transform_with_options(
     output: Option<PathBuf>,
     stdout: bool,
     opt_level: OptimizationLevel,
+    config: VmConfig,
 ) -> Result<Option<PathBuf>, String> {
     let ext = path
         .extension()
@@ -45,7 +51,7 @@ fn asm_transform_with_options(
         .to_ascii_lowercase();
 
     match ext.as_str() {
-        "aelys" => disassemble_source(path, output, stdout, opt_level),
+        "aelys" => disassemble_source(path, output, stdout, opt_level, config),
         "avbc" => disassemble_avbc(path, output, stdout),
         "aasm" => Err("input is already assembly".to_string()),
         _ => Err(format!(
@@ -60,10 +66,11 @@ fn disassemble_source(
     output: Option<PathBuf>,
     stdout: bool,
     opt_level: OptimizationLevel,
+    config: VmConfig,
 ) -> Result<Option<PathBuf>, String> {
     let content = std::fs::read_to_string(path)
         .map_err(|err| format!("failed to read {}: {}", path.display(), err))?;
-    let (function, heap) = compile_source(path, &content, opt_level)?;
+    let (function, heap) = compile_source(path, &content, opt_level, config)?;
     let text = disassemble_to_string(&function, Some(&heap));
     write_output(path, output, stdout, text)
 }
@@ -101,6 +108,7 @@ fn compile_source(
     path: &Path,
     content: &str,
     opt_level: OptimizationLevel,
+    config: VmConfig,
 ) -> Result<(aelys_bytecode::Function, aelys_bytecode::Heap), String> {
     let name = path.display().to_string();
     let src = Source::new(&name, content);
@@ -112,7 +120,7 @@ fn compile_source(
         .parse()
         .map_err(|err| err.to_string())?;
 
-    let mut vm = VM::with_config_and_args(src.clone(), VmConfig::default(), Vec::new())
+    let mut vm = VM::with_config_and_args(src.clone(), config, Vec::new())
         .map_err(|err| err.to_string())?;
 
     let (imports, _loader) = load_modules_with_loader(&stmts, path, src.clone(), &mut vm)

@@ -57,10 +57,7 @@ fn dispatch(parsed: args::ParsedArgs) -> Result<i32, String> {
             output,
             stdout,
         } => {
-            if !parsed.vm_args.is_empty() {
-                return Err("vm flags are only supported for run or repl".to_string());
-            }
-            commands::asm::run_with_options(&path, output, stdout, parsed.opt_level)
+            commands::asm::run_with_options(&path, output, stdout, parsed.opt_level, parsed.vm_args)
         }
         args::Command::Repl => {
             // REPL uses Basic optimization to preserve top-level variables across inputs

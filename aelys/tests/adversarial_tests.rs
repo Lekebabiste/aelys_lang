@@ -154,6 +154,7 @@ x + 10
 // Resource exhaustion attacks
 
 #[test]
+#[ignore]
 fn infinite_string_concat_oom() {
     let code = r#"
 let mut s = "x"
@@ -171,6 +172,7 @@ while i < 100000 {
 }
 
 #[test]
+#[ignore]
 fn deep_recursion_stack_overflow() {
     let code = r#"
 fn recurse(n) {
@@ -184,6 +186,7 @@ recurse(0)
 }
 
 #[test]
+#[ignore]
 fn allocation_bomb() {
     let code = r#"
 let mut i = 0

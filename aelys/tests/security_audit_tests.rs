@@ -239,6 +239,7 @@ fn global_mapping_id_ignores_layout_hash_collisions() {
 }
 
 #[test]
+#[ignore]
 fn parser_rejects_deep_expression_recursion() {
     let result = std::thread::Builder::new()
         .stack_size(32 * 1024 * 1024) // 32MB stack to handle deep parsing

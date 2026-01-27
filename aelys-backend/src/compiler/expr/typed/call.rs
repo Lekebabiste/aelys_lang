@@ -1,6 +1,7 @@
 use super::super::Compiler;
 use aelys_bytecode::OpCode;
 use aelys_common::Result;
+use aelys_sema::InferType;
 use aelys_syntax::Span;
 
 impl Compiler {
@@ -13,7 +14,37 @@ impl Compiler {
     ) -> Result<()> {
         use aelys_sema::TypedExprKind;
 
+        // Check for Array/Vec method calls first
         if let TypedExprKind::Member { object, member } = &callee.kind {
+            // Handle Array methods
+            if let InferType::Array(_) = &object.ty {
+                if member == "len" && args.is_empty() {
+                    return self.compile_array_len(object, dest, span);
+                }
+            }
+
+            // Handle Vec methods
+            if let InferType::Vec(inner) = &object.ty {
+                match member.as_str() {
+                    "len" if args.is_empty() => {
+                        return self.compile_vec_len(object, dest, span);
+                    }
+                    "push" if args.len() == 1 => {
+                        return self.compile_vec_push(object, inner, &args[0], dest, span);
+                    }
+                    "pop" if args.is_empty() => {
+                        return self.compile_vec_pop(object, inner, dest, span);
+                    }
+                    "capacity" if args.is_empty() => {
+                        return self.compile_vec_capacity(object, dest, span);
+                    }
+                    "reserve" if args.len() == 1 => {
+                        return self.compile_vec_reserve(object, &args[0], dest, span);
+                    }
+                    _ => {}
+                }
+            }
+
             if let TypedExprKind::Identifier(module_name) = &object.kind {
                 if self.module_aliases.contains(module_name) {
                     let qualified_name = format!("{}::{}", module_name, member);

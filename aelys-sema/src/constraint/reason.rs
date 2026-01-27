@@ -23,6 +23,12 @@ pub enum ConstraintReason {
     ForBounds,
     /// Comparison operands
     Comparison,
+    /// Array element types must be consistent
+    ArrayElement,
+    /// Array index must be int
+    ArrayIndex,
+    /// Range bounds must be int
+    RangeBound,
     /// Generic constraint
     Other(String),
 }
@@ -51,6 +57,9 @@ impl fmt::Display for ConstraintReason {
             ConstraintReason::WhileCondition => write!(f, "while condition"),
             ConstraintReason::ForBounds => write!(f, "for loop bounds"),
             ConstraintReason::Comparison => write!(f, "comparison"),
+            ConstraintReason::ArrayElement => write!(f, "array element"),
+            ConstraintReason::ArrayIndex => write!(f, "array index"),
+            ConstraintReason::RangeBound => write!(f, "range bound"),
             ConstraintReason::Other(s) => write!(f, "{}", s),
         }
     }

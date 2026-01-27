@@ -19,7 +19,9 @@ pub enum InferType {
 
     // Composite types (for future extension)
     Array(Box<InferType>),
+    Vec(Box<InferType>),
     Tuple(Vec<InferType>),
+    Range,
 
     // Type variable (placeholder during inference)
     Var(TypeVarId),
@@ -36,7 +38,7 @@ impl InferType {
             InferType::Function { params, ret } => {
                 params.iter().any(|p| p.has_vars()) || ret.has_vars()
             }
-            InferType::Array(inner) => inner.has_vars(),
+            InferType::Array(inner) | InferType::Vec(inner) => inner.has_vars(),
             InferType::Tuple(elems) => elems.iter().any(|e| e.has_vars()),
             _ => false,
         }
@@ -92,6 +94,7 @@ impl fmt::Display for InferType {
                 write!(f, ") -> {}", ret)
             }
             InferType::Array(inner) => write!(f, "[{}]", inner),
+            InferType::Vec(inner) => write!(f, "vec[{}]", inner),
             InferType::Tuple(elems) => {
                 write!(f, "(")?;
                 for (i, e) in elems.iter().enumerate() {
@@ -102,6 +105,7 @@ impl fmt::Display for InferType {
                 }
                 write!(f, ")")
             }
+            InferType::Range => write!(f, "range"),
             InferType::Var(id) => write!(f, "{}", id),
             InferType::Dynamic => write!(f, "dynamic"),
         }

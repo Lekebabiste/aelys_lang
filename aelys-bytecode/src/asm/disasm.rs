@@ -736,6 +736,194 @@ impl<'a> DisasmContext<'a> {
                 let (_, a, b, c) = decode_a(instr);
                 format!("XorIImm   r{}, r{}, {}", a, b, c)
             }
+
+            // Array operations
+            OpCode::ArrayNewI => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("ArrayNewI r{}, r{}", a, b)
+            }
+            OpCode::ArrayNewF => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("ArrayNewF r{}, r{}", a, b)
+            }
+            OpCode::ArrayNewB => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("ArrayNewB r{}, r{}", a, b)
+            }
+            OpCode::ArrayNewP => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("ArrayNewP r{}, r{}", a, b)
+            }
+            OpCode::ArrayLit => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("ArrayLit  r{}, r{}, {}", a, b, c)
+            }
+            OpCode::ArrayLoadI => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("ArrayLoadI r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::ArrayLoadF => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("ArrayLoadF r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::ArrayLoadB => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("ArrayLoadB r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::ArrayLoadP => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("ArrayLoadP r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::ArrayGetI => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("ArrayGetI r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::ArrayGetF => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("ArrayGetF r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::ArrayGetB => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("ArrayGetB r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::ArrayGetP => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("ArrayGetP r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::ArrayStoreI => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("ArrayStoreI r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::ArrayStoreF => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("ArrayStoreF r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::ArrayStoreB => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("ArrayStoreB r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::ArrayStoreP => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("ArrayStoreP r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::ArrayLen => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("ArrayLen  r{}, r{}", a, b)
+            }
+
+            // Vec operations
+            OpCode::VecNewI => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecNewI   r{}, r{}", a, b)
+            }
+            OpCode::VecNewF => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecNewF   r{}, r{}", a, b)
+            }
+            OpCode::VecNewB => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecNewB   r{}, r{}", a, b)
+            }
+            OpCode::VecNewP => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecNewP   r{}, r{}", a, b)
+            }
+            OpCode::VecLit => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("VecLit    r{}, r{}, {}", a, b, c)
+            }
+            OpCode::VecPushI => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecPushI  r{}, r{}", a, b)
+            }
+            OpCode::VecPushF => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecPushF  r{}, r{}", a, b)
+            }
+            OpCode::VecPushB => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecPushB  r{}, r{}", a, b)
+            }
+            OpCode::VecPushP => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecPushP  r{}, r{}", a, b)
+            }
+            OpCode::VecPopI => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecPopI   r{}, r{}", a, b)
+            }
+            OpCode::VecPopF => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecPopF   r{}, r{}", a, b)
+            }
+            OpCode::VecPopB => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecPopB   r{}, r{}", a, b)
+            }
+            OpCode::VecPopP => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecPopP   r{}, r{}", a, b)
+            }
+            OpCode::VecLen => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecLen    r{}, r{}", a, b)
+            }
+            OpCode::VecCap => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecCap    r{}, r{}", a, b)
+            }
+            OpCode::VecReserve => {
+                let (_, a, b, _) = decode_a(instr);
+                format!("VecReserve r{}, r{}", a, b)
+            }
+            OpCode::VecLoadI => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("VecLoadI  r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::VecLoadF => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("VecLoadF  r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::VecLoadB => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("VecLoadB  r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::VecLoadP => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("VecLoadP  r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::VecGetI => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("VecGetI   r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::VecGetF => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("VecGetF   r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::VecGetB => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("VecGetB   r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::VecGetP => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("VecGetP   r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::VecStoreI => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("VecStoreI r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::VecStoreF => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("VecStoreF r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::VecStoreB => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("VecStoreB r{}, r{}, r{}", a, b, c)
+            }
+            OpCode::VecStoreP => {
+                let (_, a, b, c) = decode_a(instr);
+                format!("VecStoreP r{}, r{}, r{}", a, b, c)
+            }
         }
     }
 
@@ -781,6 +969,8 @@ impl<'a> DisasmContext<'a> {
                         }
                         ObjectKind::Upvalue(_) => "upvalue".to_string(),
                         ObjectKind::Closure(_) => "closure".to_string(),
+                        ObjectKind::Array(a) => format!("array[{}]", a.len()),
+                        ObjectKind::Vec(v) => format!("vec[{}]", v.len()),
                     }
                 } else {
                     format!("ptr {}", ptr)

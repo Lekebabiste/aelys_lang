@@ -57,6 +57,20 @@ fn has_side_effects(expr: &TypedExpr) -> bool {
         }
         TypedExprKind::Lambda(_) | TypedExprKind::LambdaInner { .. } => false,
         TypedExprKind::Member { object, .. } => has_side_effects(object),
+        TypedExprKind::ArrayLiteral { elements, .. } | TypedExprKind::VecLiteral { elements, .. } => {
+            elements.iter().any(has_side_effects)
+        }
+        TypedExprKind::Index { object, index } => {
+            has_side_effects(object) || has_side_effects(index)
+        }
+        TypedExprKind::IndexAssign { .. } => true, // assignment has side effects
+        TypedExprKind::Range { start, end, .. } => {
+            start.as_ref().map_or(false, |s| has_side_effects(s))
+                || end.as_ref().map_or(false, |e| has_side_effects(e))
+        }
+        TypedExprKind::Slice { object, range } => {
+            has_side_effects(object) || has_side_effects(range)
+        }
         TypedExprKind::Identifier(_) | TypedExprKind::Int(_) | TypedExprKind::Float(_)
         | TypedExprKind::Bool(_) | TypedExprKind::String(_) | TypedExprKind::Null => false,
     }

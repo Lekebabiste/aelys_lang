@@ -161,6 +161,38 @@ pub enum TypedExprKind {
         object: Box<TypedExpr>,
         member: String,
     },
+
+    ArrayLiteral {
+        element_type: Option<crate::types::ResolvedType>,
+        elements: Vec<TypedExpr>,
+    },
+
+    VecLiteral {
+        element_type: Option<crate::types::ResolvedType>,
+        elements: Vec<TypedExpr>,
+    },
+
+    Index {
+        object: Box<TypedExpr>,
+        index: Box<TypedExpr>,
+    },
+
+    IndexAssign {
+        object: Box<TypedExpr>,
+        index: Box<TypedExpr>,
+        value: Box<TypedExpr>,
+    },
+
+    Range {
+        start: Option<Box<TypedExpr>>,
+        end: Option<Box<TypedExpr>>,
+        inclusive: bool,
+    },
+
+    Slice {
+        object: Box<TypedExpr>,
+        range: Box<TypedExpr>,
+    },
 }
 
 impl TypedExpr {

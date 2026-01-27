@@ -108,6 +108,7 @@ impl Parser {
                 | TokenKind::Null
                 | TokenKind::Identifier(_)
                 | TokenKind::LParen
+                | TokenKind::LBracket
                 | TokenKind::Minus
                 | TokenKind::Not
                 | TokenKind::If
@@ -118,15 +119,23 @@ impl Parser {
     pub(super) fn primary(&mut self) -> Result<Expr> {
         let token = self.advance();
         let span = token.span;
+        let token_kind = token.kind.clone();
 
-        let kind = match &token.kind {
-            TokenKind::Int(n) => ExprKind::Int(*n),
-            TokenKind::Float(n) => ExprKind::Float(*n),
-            TokenKind::String(s) => ExprKind::String(s.clone()),
+        let kind = match token_kind {
+            TokenKind::Int(n) => ExprKind::Int(n),
+            TokenKind::Float(n) => ExprKind::Float(n),
+            TokenKind::String(s) => ExprKind::String(s),
             TokenKind::True => ExprKind::Bool(true),
             TokenKind::False => ExprKind::Bool(false),
             TokenKind::Null => ExprKind::Null,
-            TokenKind::Identifier(name) => ExprKind::Identifier(name.clone()),
+            TokenKind::Identifier(name) if name == "Array" || name == "Vec" => {
+                return self.typed_collection_literal(name, span);
+            }
+            TokenKind::Identifier(name) => ExprKind::Identifier(name),
+
+            TokenKind::LBracket => {
+                return self.array_literal(span);
+            }
 
             TokenKind::LParen => {
                 let inner = self.expression()?;
@@ -157,5 +166,80 @@ impl Parser {
         };
 
         Ok(Expr::new(kind, span))
+    }
+
+    /// Parse array literal: [1, 2, 3]
+    fn array_literal(&mut self, start_span: aelys_syntax::Span) -> Result<Expr> {
+        let mut elements = Vec::new();
+
+        if !self.check(&TokenKind::RBracket) {
+            loop {
+                elements.push(self.expression()?);
+                if !self.match_token(&TokenKind::Comma) {
+                    break;
+                }
+                if self.check(&TokenKind::RBracket) {
+                    break;
+                }
+            }
+        }
+
+        self.consume(&TokenKind::RBracket, "]")?;
+        let end_span = self.previous().span;
+
+        Ok(Expr::new(
+            ExprKind::ArrayLiteral {
+                element_type: None,
+                elements,
+            },
+            start_span.merge(end_span),
+        ))
+    }
+
+    /// Parse typed collection literal: Array<Int>[1, 2, 3] or Vec<Float>[1.0, 2.0]
+    fn typed_collection_literal(
+        &mut self,
+        collection_name: String,
+        start_span: aelys_syntax::Span,
+    ) -> Result<Expr> {
+        let element_type = if self.match_token(&TokenKind::Lt) {
+            let type_ann = self.parse_type_annotation()?;
+            self.consume(&TokenKind::Gt, ">")?;
+            Some(type_ann)
+        } else {
+            None
+        };
+
+        self.consume(&TokenKind::LBracket, "[")?;
+
+        let mut elements = Vec::new();
+        if !self.check(&TokenKind::RBracket) {
+            loop {
+                elements.push(self.expression()?);
+                if !self.match_token(&TokenKind::Comma) {
+                    break;
+                }
+                if self.check(&TokenKind::RBracket) {
+                    break;
+                }
+            }
+        }
+
+        self.consume(&TokenKind::RBracket, "]")?;
+        let end_span = self.previous().span;
+
+        let kind = if collection_name == "Vec" {
+            ExprKind::VecLiteral {
+                element_type,
+                elements,
+            }
+        } else {
+            ExprKind::ArrayLiteral {
+                element_type,
+                elements,
+            }
+        };
+
+        Ok(Expr::new(kind, start_span.merge(end_span)))
     }
 }

@@ -35,6 +35,26 @@ impl GlobalConstantPropagator {
                 for stmt in body { self.substitute_in_stmt(stmt); }
             }
             TypedExprKind::Member { object, .. } => self.substitute_constants(object),
+            TypedExprKind::ArrayLiteral { elements, .. } | TypedExprKind::VecLiteral { elements, .. } => {
+                for elem in elements { self.substitute_constants(elem); }
+            }
+            TypedExprKind::Index { object, index } => {
+                self.substitute_constants(object);
+                self.substitute_constants(index);
+            }
+            TypedExprKind::IndexAssign { object, index, value } => {
+                self.substitute_constants(object);
+                self.substitute_constants(index);
+                self.substitute_constants(value);
+            }
+            TypedExprKind::Range { start, end, .. } => {
+                if let Some(s) = start { self.substitute_constants(s); }
+                if let Some(e) = end { self.substitute_constants(e); }
+            }
+            TypedExprKind::Slice { object, range } => {
+                self.substitute_constants(object);
+                self.substitute_constants(range);
+            }
             TypedExprKind::Int(_) | TypedExprKind::Float(_) | TypedExprKind::Bool(_)
             | TypedExprKind::String(_) | TypedExprKind::Null => {}
         }

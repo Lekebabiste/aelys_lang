@@ -35,6 +35,26 @@ impl DeadCodeEliminator {
             TypedExprKind::Lambda(inner) => self.eliminate_in_expr(inner),
             TypedExprKind::LambdaInner { body, .. } => { self.eliminate_in_block(body); }
             TypedExprKind::Member { object, .. } => self.eliminate_in_expr(object),
+            TypedExprKind::ArrayLiteral { elements, .. } | TypedExprKind::VecLiteral { elements, .. } => {
+                for elem in elements { self.eliminate_in_expr(elem); }
+            }
+            TypedExprKind::Index { object, index } => {
+                self.eliminate_in_expr(object);
+                self.eliminate_in_expr(index);
+            }
+            TypedExprKind::IndexAssign { object, index, value } => {
+                self.eliminate_in_expr(object);
+                self.eliminate_in_expr(index);
+                self.eliminate_in_expr(value);
+            }
+            TypedExprKind::Range { start, end, .. } => {
+                if let Some(s) = start { self.eliminate_in_expr(s); }
+                if let Some(e) = end { self.eliminate_in_expr(e); }
+            }
+            TypedExprKind::Slice { object, range } => {
+                self.eliminate_in_expr(object);
+                self.eliminate_in_expr(range);
+            }
             TypedExprKind::Int(_) | TypedExprKind::Float(_) | TypedExprKind::Bool(_)
             | TypedExprKind::String(_) | TypedExprKind::Null | TypedExprKind::Identifier(_) => {}
         }

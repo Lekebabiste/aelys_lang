@@ -69,6 +69,34 @@ pub enum ExprKind {
     },
 
     Member { object: Box<Expr>, member: String }, // module.symbol
+
+    // Arrays and Vecs
+    ArrayLiteral {
+        element_type: Option<TypeAnnotation>,  // Array<Int>[...] or Array[...]
+        elements: Vec<Expr>,
+    },
+    VecLiteral {
+        element_type: Option<TypeAnnotation>,
+        elements: Vec<Expr>,
+    },
+    Index {
+        object: Box<Expr>,
+        index: Box<Expr>,
+    },
+    IndexAssign {
+        object: Box<Expr>,
+        index: Box<Expr>,
+        value: Box<Expr>,
+    },
+    Range {
+        start: Option<Box<Expr>>,
+        end: Option<Box<Expr>>,
+        inclusive: bool,  // .. vs ..=
+    },
+    Slice {
+        object: Box<Expr>,
+        range: Box<Expr>,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

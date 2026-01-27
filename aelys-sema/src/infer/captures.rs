@@ -138,6 +138,33 @@ impl TypeInference {
             TypedExprKind::Member { object, .. } => {
                 self.collect_captures_inner(object, params, captures, seen);
             }
+            TypedExprKind::ArrayLiteral { elements, .. }
+            | TypedExprKind::VecLiteral { elements, .. } => {
+                for elem in elements {
+                    self.collect_captures_inner(elem, params, captures, seen);
+                }
+            }
+            TypedExprKind::Index { object, index } => {
+                self.collect_captures_inner(object, params, captures, seen);
+                self.collect_captures_inner(index, params, captures, seen);
+            }
+            TypedExprKind::IndexAssign { object, index, value } => {
+                self.collect_captures_inner(object, params, captures, seen);
+                self.collect_captures_inner(index, params, captures, seen);
+                self.collect_captures_inner(value, params, captures, seen);
+            }
+            TypedExprKind::Range { start, end, .. } => {
+                if let Some(s) = start {
+                    self.collect_captures_inner(s, params, captures, seen);
+                }
+                if let Some(e) = end {
+                    self.collect_captures_inner(e, params, captures, seen);
+                }
+            }
+            TypedExprKind::Slice { object, range } => {
+                self.collect_captures_inner(object, params, captures, seen);
+                self.collect_captures_inner(range, params, captures, seen);
+            }
             TypedExprKind::Int(_)
             | TypedExprKind::Float(_)
             | TypedExprKind::Bool(_)

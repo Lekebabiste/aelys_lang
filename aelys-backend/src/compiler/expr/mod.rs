@@ -1,3 +1,4 @@
+mod array;
 mod binary;
 mod control;
 mod identifier;
@@ -41,6 +42,24 @@ impl Compiler {
             } => self.compile_lambda(params, body, dest, expr.span),
             ExprKind::Member { object, member } => {
                 self.compile_member_access(object, member, dest, expr.span)
+            }
+            ExprKind::ArrayLiteral { elements, .. } => {
+                self.compile_array_literal(elements, dest, expr.span)
+            }
+            ExprKind::VecLiteral { elements, .. } => {
+                self.compile_vec_literal(elements, dest, expr.span)
+            }
+            ExprKind::Index { object, index } => {
+                self.compile_index_access(object, index, dest, expr.span)
+            }
+            ExprKind::IndexAssign { object, index, value } => {
+                self.compile_index_assign(object, index, value, dest, expr.span)
+            }
+            ExprKind::Range { start, end, inclusive } => {
+                self.compile_range(start, end, *inclusive, dest, expr.span)
+            }
+            ExprKind::Slice { object, range } => {
+                self.compile_slice(object, range, dest, expr.span)
             }
         }
     }

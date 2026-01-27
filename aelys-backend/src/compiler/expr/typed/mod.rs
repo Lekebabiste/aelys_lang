@@ -1,5 +1,4 @@
-//! Typed expression compilation.
-
+mod array;
 mod assign;
 mod binary;
 mod call;

@@ -186,6 +186,80 @@ let greeting = "Hello, " + name + "!"
 
 No string interpolation yet, it's on my list but not a priority
 
+## Arrays and Vectors
+
+### Arrays
+
+Arrays hold multiple values of the same type:
+
+```rust
+needs std.io
+needs std.convert
+
+let numbers = Array[10, 20, 30, 40, 50]
+io.print(numbers[0])  // 10
+io.print(numbers[2])  // 30
+io.print(convert.to_string(numbers.len()))  // 5
+```
+
+Modify elements like this:
+
+```rust
+let scores = Array[95, 87, 92]
+scores[1] = 90
+io.print(scores[1])  // 90
+```
+
+You can add type annotations if you want to be explicit:
+
+```rust
+let ints = Array<Int>[1, 2, 3]
+let floats = Array<Float>[1.5, 2.7, 3.9]
+```
+
+Empty arrays need a type:
+
+```rust
+let empty = Array<Int>[]
+```
+
+### Vectors
+
+Vectors can grow after you create them:
+
+```rust
+needs std.io
+needs std.convert
+
+let v = Vec[1, 2, 3]
+v.push(4)
+v.push(5)
+io.print(convert.to_string(v.len()))  // 5
+
+let last = v.pop()
+io.print(convert.to_string(last))  // 5
+```
+
+Good for building lists on the fly:
+
+```rust
+let scores = Vec[]
+scores.push(95)
+scores.push(87)
+scores.push(92)
+
+let mut sum = 0
+for i in 0..scores.len() {
+    sum = sum + scores[i]
+}
+io.print(convert.to_string(sum / scores.len()))  // average
+```
+
+### When to use which
+
+- **Array**: Size is fixed (coordinates, color values)
+- **Vec**: Size changes (user input, dynamic lists)
+
 ## A Complete Example
 
 Here's a program that calculates factorials:
@@ -215,6 +289,7 @@ for i in 1..=10 {
 
 - [Language Specification](language-spec.md) - complete syntax reference
 - [Standard Library](standard-library.md) - available modules and functions
-- [Examples](../examples/examples.md) - more code to learn from
+- [Examples](../examples/README.md) - array examples, demos, and more
+- [Performance](performance-benchmarks.md) - benchmarks and optimization tips
 
-If you want to understand what makes Aelys different, check out the section on [@no_gc](language-spec.md#no_gc-manual-memory) in the language spec.
+If you want to understand what makes Aelys different, check out the [@no_gc](language-spec.md#attributes) section in the language spec.

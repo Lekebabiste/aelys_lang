@@ -88,6 +88,8 @@ Represents absence of value. Functions without explicit return give `null`.
 | `bool` | Boolean | 1 bit (packed) |
 | `null` | Null value | - |
 | `function` | Function/closure | heap allocated |
+| `Array<T>` | Fixed-size array | heap allocated |
+| `Vec<T>` | Growable vector | heap allocated |
 
 ### Type Annotations
 
@@ -535,6 +537,143 @@ Explicit semicolons let you put multiple statements on one line:
 let x = 1; let y = 2; let z = 3
 ```
 
+## Collections
+
+### Arrays
+
+Arrays hold a fixed number of elements. Once created, their size doesn't change.
+
+```rust
+let numbers = Array<Int>[1, 2, 3, 4, 5]
+let floats = Array<Float>[1.0, 2.5, 3.7]
+let flags = Array<Bool>[true, false, true]
+
+// Type inference works
+let auto = Array[10, 20, 30]  // infers Array<Int>
+let short = [1, 2, 3]          // shorthand syntax
+```
+
+Empty arrays need a type:
+
+```rust
+let empty = Array<Int>[]
+```
+
+**Basic operations:**
+
+```rust
+let arr = Array[1, 2, 3, 4, 5]
+
+arr[0]         // 1
+arr[4]         // 5
+arr[2] = 99    // modify element
+arr.len()      // 5
+
+arr[100]       // panic: index out of bounds
+```
+
+Under the hood, arrays use compact storage: 8 bytes per Int/Float, 1 byte per Bool.
+
+### Vectors
+
+Vectors are like arrays but they can grow. Need to add more elements? No problem.
+
+```rust
+let v = Vec<Int>[1, 2, 3]
+v.push(4)
+v.push(5)
+v.len()  // 5
+
+let last = v.pop()  // removes and returns 5
+v.len()  // back to 4
+```
+
+Empty vectors:
+
+```rust
+let v = Vec<Int>[]  // or just Vec[]
+```
+
+**Operations:**
+
+```rust
+let v = Vec[10, 20, 30]
+
+// Array stuff works
+v[0]                // 10
+v.len()             // 3
+v[1] = 25           // modify
+
+// Vec-specific
+v.push(40)          // add element
+let x = v.pop()     // remove last and return it
+v.capacity()        // how much space is allocated
+v.reserve(100)      // pre-allocate for 100 elements
+```
+
+Vecs grow automatically when they run out of space. The capacity is usually bigger than the length to avoid reallocating every time you push.
+
+**When to use which:**
+
+- **Array**: Size is fixed, mostly reading (coordinates, RGB colors)
+- **Vec**: Size changes, lots of push/pop (lists, stacks, dynamic buffers)
+
+### Type Safety
+
+All elements must be the same type:
+
+```rust
+let good = Array[1, 2, 3]           // ✓ all int
+let bad = Array[1, "two", 3.0]      // ✗ won't compile
+```
+
+`Array<Int>` and `Array<Float>` are different types. The compiler keeps track.
+
+### Passing to Functions
+
+Arrays and Vecs are passed by reference, so changes inside a function affect the original:
+
+```rust
+fn sum(arr) -> int {
+    let mut total = 0
+    for i in 0..arr.len() {
+        total = total + arr[i]
+    }
+    return total
+}
+
+let numbers = Array[1, 2, 3, 4, 5]
+sum(numbers)  // 15
+```
+
+Mutations persist:
+
+```rust
+fn double_all(v) {
+    for i in 0..v.len() {
+        v[i] = v[i] * 2
+    }
+}
+
+let v = Vec[1, 2, 3]
+double_all(v)
+v[0]  // 2 (modified by the function)
+```
+
+### Iteration
+
+For now, use index-based loops:
+
+```rust
+let arr = Array[10, 20, 30, 40]
+
+for i in 0..arr.len() {
+    io.print(arr[i])
+}
+```
+
+Iterator methods like `arr.iter()`, `arr.map()`, `arr.filter()` are coming later.
+
 ## Error Handling
 
 Currently there's no try/catch mechanism. Functions that can fail return `null` on failure:
@@ -555,10 +694,9 @@ Standard library functions follow this pattern. A proper error handling system i
 
 Things I'm considering but haven't implemented yet:
 
-- Arrays/lists as first-class types
 - `match` expressions
 - `struct` types
 - `enum` types
-- Generics
 - Async/await
 - String interpolation
+- Iterator methods on arrays

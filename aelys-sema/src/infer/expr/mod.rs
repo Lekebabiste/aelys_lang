@@ -1,5 +1,4 @@
-//! Expression inference.
-
+mod array;
 mod assign;
 mod binary;
 mod call;
@@ -82,6 +81,24 @@ impl TypeInference {
             } => self.infer_lambda_expr(params, return_type.as_ref(), body, expr.span),
             ExprKind::Member { object, member } => {
                 self.infer_member_expr(object, member, expr.span)
+            }
+            ExprKind::ArrayLiteral { element_type, elements } => {
+                self.infer_array_literal(element_type, elements, expr.span)
+            }
+            ExprKind::VecLiteral { element_type, elements } => {
+                self.infer_vec_literal(element_type, elements, expr.span)
+            }
+            ExprKind::Index { object, index } => {
+                self.infer_index_expr(object, index, expr.span)
+            }
+            ExprKind::IndexAssign { object, index, value } => {
+                self.infer_index_assign_expr(object, index, value, expr.span)
+            }
+            ExprKind::Range { start, end, inclusive } => {
+                self.infer_range_expr(start, end, *inclusive, expr.span)
+            }
+            ExprKind::Slice { object, range } => {
+                self.infer_slice_expr(object, range, expr.span)
             }
         };
 

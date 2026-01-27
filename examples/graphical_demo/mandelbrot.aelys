@@ -11,7 +11,6 @@ let MAX_ITER = 80
 let ESC = convert.chr(27)
 let HALF = convert.chr(9600)
 
-@no_gc
 fn run() {
     let fb = bytes.alloc(W * H)
     let pal_r = bytes.alloc(MAX_ITER + 1)

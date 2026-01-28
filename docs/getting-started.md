@@ -18,9 +18,18 @@ Run it:
 aelys hello.aelys
 ```
 
-That's your first program ! The `needs` statement imports the `std.io` module, and `io.print` writes to stdout.
+That's your first program ! The `needs` statement imports the `std.io` module. You can call `print` directly, or use `io.print` if you prefer the qualified form.
 
-You don't need a `main` function - top-level code just runs.
+```rust
+needs std.io
+
+print("This also works!")
+```
+
+But throughout this guide, we'll use `io.print()` to make it clear where functions come from
+
+You don't need a `main` function, top-level code just runs.
+
 ## Variables
 
 ```rust

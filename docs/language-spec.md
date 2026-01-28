@@ -367,7 +367,9 @@ needs print from std.io          // single function
 needs sqrt, pow from std.math    // multiple functions
 ```
 
-After `needs std.io`, you access functions as `io.print()`.
+After `needs std.io`, you can use both `print()` directly and `io.print()`.
+
+With an alias (`needs std.io as x`), only the aliased form works: `x.print()`.
 
 After `needs print from std.io`, you call `print()` directly.
 

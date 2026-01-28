@@ -49,6 +49,7 @@ pub fn load_modules_for_program(
                 known_native_globals.insert(native_name.clone());
             }
 
+            let module_alias = loader.get_module_alias(needs);
             match &needs.kind {
                 ImportKind::Module { alias: None } => {
                     for name in module_info.exports.keys() {
@@ -64,16 +65,28 @@ pub fn load_modules_for_program(
                         }
                         symbol_origins.insert(name.clone(), module_path.clone());
                         known_globals.insert(name.clone());
+                        let qualified = format!("{}::{}", module_alias, name);
+                        if module_info.native_functions.contains(&qualified) {
+                            known_native_globals.insert(name.clone());
+                        }
                     }
                 }
                 ImportKind::Symbols(symbols) => {
                     for sym in symbols {
                         known_globals.insert(sym.clone());
+                        let qualified = format!("{}::{}", module_alias, sym);
+                        if module_info.native_functions.contains(&qualified) {
+                            known_native_globals.insert(sym.clone());
+                        }
                     }
                 }
                 ImportKind::Wildcard => {
                     for name in module_info.exports.keys() {
                         known_globals.insert(name.clone());
+                        let qualified = format!("{}::{}", module_alias, name);
+                        if module_info.native_functions.contains(&qualified) {
+                            known_native_globals.insert(name.clone());
+                        }
                     }
                 }
                 _ => {}
@@ -131,6 +144,7 @@ pub fn load_modules_with_loader(
                 known_native_globals.insert(native_name.clone());
             }
 
+            let module_alias = loader.get_module_alias(needs);
             match &needs.kind {
                 ImportKind::Module { alias: None } => {
                     for name in module_info.exports.keys() {
@@ -146,16 +160,28 @@ pub fn load_modules_with_loader(
                         }
                         symbol_origins.insert(name.clone(), module_path.clone());
                         known_globals.insert(name.clone());
+                        let qualified = format!("{}::{}", module_alias, name);
+                        if module_info.native_functions.contains(&qualified) {
+                            known_native_globals.insert(name.clone());
+                        }
                     }
                 }
                 ImportKind::Symbols(symbols) => {
                     for sym in symbols {
                         known_globals.insert(sym.clone());
+                        let qualified = format!("{}::{}", module_alias, sym);
+                        if module_info.native_functions.contains(&qualified) {
+                            known_native_globals.insert(sym.clone());
+                        }
                     }
                 }
                 ImportKind::Wildcard => {
                     for name in module_info.exports.keys() {
                         known_globals.insert(name.clone());
+                        let qualified = format!("{}::{}", module_alias, name);
+                        if module_info.native_functions.contains(&qualified) {
+                            known_native_globals.insert(name.clone());
+                        }
                     }
                 }
                 _ => {}

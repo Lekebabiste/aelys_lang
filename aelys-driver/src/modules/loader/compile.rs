@@ -88,10 +88,14 @@ impl ModuleLoader {
                         known_native_globals.insert(native_name.clone());
                     }
 
-                    if matches!(nested_needs.kind, aelys_syntax::ImportKind::Wildcard) {
-                        for name in module_info.exports.keys() {
-                            known_globals.insert(name.clone());
+                    match &nested_needs.kind {
+                        aelys_syntax::ImportKind::Module { alias: None }
+                        | aelys_syntax::ImportKind::Wildcard => {
+                            for name in module_info.exports.keys() {
+                                known_globals.insert(name.clone());
+                            }
                         }
+                        _ => {}
                     }
                 }
             }

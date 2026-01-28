@@ -33,6 +33,7 @@ impl CompileErrorKind {
             Self::NativeCapabilityDenied { .. } => 407,
             Self::NativeChecksumMismatch { .. } => 408,
             Self::NativeVersionMismatch { .. } => 409,
+            Self::SymbolConflict { .. } => 410,
             Self::TypeInferenceError(_) => 301,
         }
     }

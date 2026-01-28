@@ -78,6 +78,10 @@ pub enum CompileErrorKind {
         required: String,
         found: Option<String>,
     },
+    SymbolConflict {
+        symbol: String,
+        modules: Vec<String>,
+    },
 
     TypeInferenceError(String),
 }

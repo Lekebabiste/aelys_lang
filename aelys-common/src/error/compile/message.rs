@@ -104,6 +104,13 @@ impl CompileErrorKind {
                 )
             }
             Self::TypeInferenceError(msg) => format!("type error: {}", msg),
+            Self::SymbolConflict { symbol, modules } => {
+                format!(
+                    "symbol '{}' is exported by multiple modules: {}\n   = hint: use 'as' alias to disambiguate",
+                    symbol,
+                    modules.join(", ")
+                )
+            }
         }
     }
 }

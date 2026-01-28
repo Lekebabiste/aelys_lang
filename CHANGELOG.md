@@ -2,7 +2,14 @@
 
 All notable changes to Aelys, roughly grouped by version. I don't always tag releases perfectly, so this is reconstructed from git history
 
-## 0.18.x (Current)
+## 0.19.x - Array and Vec Implementations
+
+**0.19.0-a**
+- Added array and vec implementations to the VM
+
+## 0.18.x - Native Binary Data Manipulation 
+
+This update adds real memory manipulation for @no_gc mode
 
 **0.18.6-a**
 - Fixed call site cache using stale entries after global mutation

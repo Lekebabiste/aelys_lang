@@ -100,12 +100,14 @@ needs std.math
 | `min(a, b)` | Minimum of two values |
 | `max(a, b)` | Maximum of two values |
 | `clamp(x, min, max)` | Clamp value to range |
+| `randint(debut, fin)` | Random integer in range [debut, fin] (inclusive) |
 
 ```rust
 math.abs(-5)        // 5
 math.sqrt(16.0)     // 4.0
 math.pow(2, 10)     // 1024
 math.clamp(15, 0, 10)  // 10
+math.randint(1, 6)  // random int from 1 to 6 (dice roll)
 ```
 
 ### Trigonometry

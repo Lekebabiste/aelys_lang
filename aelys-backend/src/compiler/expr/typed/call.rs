@@ -116,6 +116,9 @@ impl Compiler {
             }
 
             if self.resolve_variable(name).is_none() && self.resolve_upvalue(name).is_none() {
+                if !self.globals.contains_key(name) && !self.known_globals.contains(name) {
+                    return self.compile_typed_call_fallback(callee, args, dest, span);
+                }
                 let global_idx = self.get_or_create_global_index(name);
                 self.accessed_globals.insert(name.to_string());
 

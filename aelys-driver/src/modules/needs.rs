@@ -66,6 +66,11 @@ pub fn load_modules_for_program(
                         known_globals.insert(name.clone());
                     }
                 }
+                ImportKind::Symbols(symbols) => {
+                    for sym in symbols {
+                        known_globals.insert(sym.clone());
+                    }
+                }
                 ImportKind::Wildcard => {
                     for name in module_info.exports.keys() {
                         known_globals.insert(name.clone());
@@ -141,6 +146,11 @@ pub fn load_modules_with_loader(
                         }
                         symbol_origins.insert(name.clone(), module_path.clone());
                         known_globals.insert(name.clone());
+                    }
+                }
+                ImportKind::Symbols(symbols) => {
+                    for sym in symbols {
+                        known_globals.insert(sym.clone());
                     }
                 }
                 ImportKind::Wildcard => {

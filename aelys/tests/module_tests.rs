@@ -694,6 +694,31 @@ mm.double(5)
 }
 
 #[test]
+fn test_custom_module_alias_no_direct() {
+    let dir = create_module_env();
+
+    write_file(
+        &dir,
+        "mymath.aelys",
+        r#"
+pub fn double(x) { x * 2 }
+"#,
+    );
+
+    let main_path = write_file(
+        &dir,
+        "main.aelys",
+        r#"
+needs mymath as mm
+double(5)
+"#,
+    );
+
+    let result = run_file(&main_path);
+    assert!(result.is_err());
+}
+
+#[test]
 fn test_symbol_conflict_error() {
     let dir = create_module_env();
 

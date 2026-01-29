@@ -1,5 +1,9 @@
 # Acknowledgements
 
+## Helps and Contributions
+
+**[Keggek](https://codeberg.org/gek)** - For the discussions about the project and language design <3
+
 ## Inspirations
 
 **Rust** - The syntax style, `let mut` for mutability, range expressions (`..` and `..=`).  

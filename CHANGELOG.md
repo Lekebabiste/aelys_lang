@@ -7,6 +7,7 @@ All notable changes to Aelys, roughly grouped by version. I don't always tag rel
 **0.19.3-a**
 - Added `LocalConstantPropagator` optimization pass for function-local constants
 - Fixed DCE dropping return values when eliminating `if true { expr }` branches
+- Octal support by Keggek, see [Acknowledgements](docs/acknowledgements.md)
 
 **0.19.2-a**
 - `needs std.io` imports symbols directly, `needs mod as x` restricts to qualified access only

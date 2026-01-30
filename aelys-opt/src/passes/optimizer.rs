@@ -1,10 +1,10 @@
 use super::{
-    ConstantFolder, DeadCodeEliminator, GlobalConstantPropagator, LocalConstantPropagator,
-    OptimizationLevel, OptimizationPass, OptimizationStats, UnusedVarEliminator,
+    ConstantFolder, DeadCodeEliminator, FunctionInliner, GlobalConstantPropagator,
+    LocalConstantPropagator, OptimizationLevel, OptimizationPass, OptimizationStats,
+    UnusedVarEliminator,
 };
 use aelys_sema::TypedProgram;
 
-// orchestrates optimization passes in the right order
 pub struct Optimizer {
     level: OptimizationLevel,
     passes: Vec<Box<dyn OptimizationPass>>,
@@ -18,18 +18,34 @@ impl Optimizer {
         match level {
             OptimizationLevel::None => {}
             OptimizationLevel::Basic => {
+                // conservative inlining first, then fold the results
+                passes.push(Box::new(FunctionInliner::new(level)));
                 passes.push(Box::new(LocalConstantPropagator::new()));
                 passes.push(Box::new(ConstantFolder::new()));
             }
-            // TODO: separate the passes better
-            OptimizationLevel::Standard | OptimizationLevel::Aggressive => {
+            OptimizationLevel::Standard => {
+                passes.push(Box::new(FunctionInliner::new(level)));
                 passes.push(Box::new(GlobalConstantPropagator::new()));
                 passes.push(Box::new(LocalConstantPropagator::new()));
                 passes.push(Box::new(ConstantFolder::new()));
                 passes.push(Box::new(DeadCodeEliminator::new()));
                 passes.push(Box::new(UnusedVarEliminator::new()));
+                // second pass to catch opportunities created by earlier opts
                 passes.push(Box::new(LocalConstantPropagator::new()));
                 passes.push(Box::new(ConstantFolder::new()));
+            }
+            OptimizationLevel::Aggressive => {
+                // aggressive inlining with higher bloat tolerance
+                passes.push(Box::new(FunctionInliner::new(level)));
+                passes.push(Box::new(GlobalConstantPropagator::new()));
+                passes.push(Box::new(LocalConstantPropagator::new()));
+                passes.push(Box::new(ConstantFolder::new()));
+                passes.push(Box::new(DeadCodeEliminator::new()));
+                passes.push(Box::new(UnusedVarEliminator::new()));
+                // extra iteration for aggressive mode
+                passes.push(Box::new(LocalConstantPropagator::new()));
+                passes.push(Box::new(ConstantFolder::new()));
+                passes.push(Box::new(DeadCodeEliminator::new()));
             }
         }
 

@@ -2,7 +2,7 @@ needs std.io
 needs std.bytes
 needs std.time
 needs std.math
-needs std.convert
+needs from std.convert
 
 let W = 160
 let H = 90

@@ -698,7 +698,7 @@ All `_be` variants for network byte order:
 | Function | Description |
 |----------|-------------|
 | `from_string(str)` | Create buffer from UTF-8 string. |
-| `to_string(buf, offset, len)` | Read UTF-8 string from buffer. |
+| `decode(buf, offset, len)` | Decode UTF-8 bytes to string. |
 | `write_string(buf, offset, str)` | Write string to buffer. Returns bytes written. |
 
 ### Example
@@ -720,7 +720,7 @@ fn parse_network_packet() {
 
     // Read back
     let magic = bytes.read_u32_be(buf, 0)
-    let msg = bytes.to_string(buf, 8, 6)
+    let msg = bytes.decode(buf, 8, 4)
 
     bytes.free(buf)
 }

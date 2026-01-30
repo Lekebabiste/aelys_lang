@@ -144,3 +144,54 @@ fn error_unmatched_close_brace() {
     "#);
     assert!(err.contains("unmatched") || err.contains("}"));
 }
+
+// Placeholder syntax at call site: func("fmt {}", arg)
+
+#[test]
+fn placeholder_in_call_single() {
+    let result = run_ok(r#"
+        fn identity(s) { s }
+        identity("value: {}", 42)
+    "#);
+    assert!(result.as_ptr().is_some());
+}
+
+#[test]
+fn placeholder_in_call_multiple() {
+    let result = run_ok(r#"
+        fn identity(s) { s }
+        let x = 10
+        let y = 20
+        identity("x={}, y={}", x, y)
+    "#);
+    assert!(result.as_ptr().is_some());
+}
+
+#[test]
+fn placeholder_in_call_with_extra_args() {
+    // func("fmt {}", val, extra_arg) - extra_arg goes to func
+    let result = run_ok(r#"
+        fn take_two(s, n) { s }
+        take_two("num: {}", 42, 99)
+    "#);
+    assert!(result.as_ptr().is_some());
+}
+
+#[test]
+fn placeholder_mixed_with_inline() {
+    let result = run_ok(r#"
+        fn identity(s) { s }
+        let name = "Alice"
+        identity("hello {name}, your number is {}", 7)
+    "#);
+    assert!(result.as_ptr().is_some());
+}
+
+#[test]
+fn placeholder_not_enough_args() {
+    let err = run_err(r#"
+        fn identity(s) { s }
+        identity("a={}, b={}", 1)
+    "#);
+    assert!(err.contains("placeholder") || err.contains("argument"));
+}

@@ -94,6 +94,22 @@ Values are converted to strings automatically. To include a literal brace, doubl
 "JSON: {{key}}"             // "JSON: {key}"
 ```
 
+**Placeholder Syntax**
+
+You can also use `{}` as placeholders filled by function call arguments:
+
+```rust
+print("Hello, {}!", "world")     // "Hello, world!"
+print("x={}, y={}", 10, 20)      // "x=10, y=20"
+```
+
+Placeholders are filled left-to-right. You can mix inline expressions and placeholders:
+
+```rust
+let name = "Alice"
+print("Hi {name}, your number is {}", 42)
+```
+
 **Booleans**
 ```rust
 true

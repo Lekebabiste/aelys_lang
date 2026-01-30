@@ -17,6 +17,11 @@ impl InlineExpander {
         args: &[TypedExpr],
         call_span: Span,
     ) -> Option<TypedExpr> {
+        // don't inline if arity doesn't match
+        if func.params.len() != args.len() {
+            return None;
+        }
+
         let param_map: HashMap<String, TypedExpr> = func
             .params
             .iter()

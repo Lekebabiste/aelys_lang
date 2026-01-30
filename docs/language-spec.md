@@ -525,6 +525,114 @@ fn parse_binary() {
 
 - Honestly, most code, stick to the GC unless you have a specific need
 
+### @inline and @inline_always (Function Inlining)
+
+These attributes tell the compiler to substitute a function's body directly at the call site, avoiding function call overhead
+
+```rust
+@inline
+fn add(a: int, b: int) -> int {
+    a + b
+}
+
+@inline_always
+fn clamp(x: int, min: int, max: int) -> int {
+    if x < min { return min }
+    if x > max { return max }
+    x
+}
+```
+
+The difference:
+
+| Attribute | Behavior |
+|-----------|----------|
+| `@inline` | Hint to the compiler. Respects code size thresholds. |
+| `@inline_always` | Forces inlining. Ignores size limits. |
+
+`@inline` can be ignored if the function is too large or if inlining would bloat the binary too much. `@inline_always` forces substitution no matter what (except truly impossible cases)
+
+**When to use `@inline`:**
+
+- Small utility functions called frequently
+- Thin wrappers around simple operations
+- Performance-critical functions in tight loops
+
+```rust
+@inline
+fn square(x: int) -> int { x * x }
+
+@inline
+fn is_even(n: int) -> bool { n % 2 == 0 }
+```
+
+**When to use `@inline_always`:**
+
+- When you know inlining helps despite the size
+- Functions with captures you still want inlined
+- Micro-benchmarks where every cycle counts
+
+**Limitations:**
+
+Some functions simply can't be inlined:
+
+| Case | Why |
+|------|-----|
+| Recursive function | Inlining would expand forever |
+| Mutual recursion | Cycle like A → B → A detected |
+| Native function | No Aelys body to substitute |
+
+```rust
+// ✗ Won't work
+@inline
+fn factorial(n: int) -> int {
+    if n <= 1 { return 1 }
+    n * factorial(n - 1)  // recursive!
+}
+```
+
+The compiler will warn you if you try
+
+**Functions with captures:**
+
+Functions that capture variables from their enclosing scope are handled differently:
+
+- `@inline`: won't be inlined (you'll get a warning)
+- `@inline_always`: forces it anyway
+
+```rust
+fn make_adder(x: int) {
+    @inline_always
+    fn add(y: int) -> int {
+        x + y  // captures x
+    }
+    return add
+}
+```
+
+Use `@inline_always` here only if you know what you're doing
+
+**Public functions:**
+
+Functions marked `pub` with `@inline` get inlined locally, but the original code is kept for callers from other modules:
+
+```rust
+@inline
+pub fn helper() {
+    // inlined within this module
+    // still available for importers
+}
+```
+
+**Automatic inlining:**
+
+Even without any attribute, the optimizer already inlines:
+
+- Trivial functions (3 statements or less)
+- Functions called only once
+
+So you don't need to annotate everything. `@inline` and `@inline_always` are for when you want explicit control !
+
 ## Semicolons
 
 Optional. The parser automatically inserts them after certain tokens (like Go does):

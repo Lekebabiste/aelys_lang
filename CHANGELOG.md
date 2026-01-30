@@ -6,6 +6,7 @@ All notable changes to Aelys, roughly grouped by version. I don't always tag rel
 
 **0.19.4-a**
 - Added `@inline` and `@inline_always` decorators
+- Strip debug info (function names, local variables, line info) in release builds (`-O1`+)
 
 **0.19.3-a**
 - Added `LocalConstantPropagator` optimization pass for function-local constants

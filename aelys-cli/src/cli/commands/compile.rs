@@ -85,7 +85,7 @@ pub fn compile_to_avbc_with_output(
     let mut optimizer = Optimizer::new(opt_level);
     let typed_program = optimizer.optimize(typed_program);
 
-    let (function, heap, _globals) = Compiler::with_modules(
+    let (mut function, heap, _globals) = Compiler::with_modules(
         None,
         src.clone(),
         imports.module_aliases,
@@ -95,6 +95,11 @@ pub fn compile_to_avbc_with_output(
     )
     .compile_typed(&typed_program)
     .map_err(|err| err.to_string())?;
+
+    // strip debug info (function names, variable names, line info) for release builds
+    if opt_level != OptimizationLevel::None {
+        function.strip_debug_info();
+    }
 
     let manifest_bytes = loader.manifest().map(Manifest::to_bytes);
     let should_bundle = loader

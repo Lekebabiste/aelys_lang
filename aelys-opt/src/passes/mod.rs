@@ -14,7 +14,7 @@ mod unused_vars;
 pub use constant_fold::ConstantFolder;
 pub use dead_code::DeadCodeEliminator;
 pub use global_const_prop::GlobalConstantPropagator;
-pub use inline::{FunctionInliner, InlineWarning};
+pub use inline::FunctionInliner;
 pub use level::OptimizationLevel;
 pub use local_const_prop::LocalConstantPropagator;
 pub use optimizer::Optimizer;

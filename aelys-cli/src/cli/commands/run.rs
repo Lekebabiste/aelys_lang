@@ -1,4 +1,5 @@
 use crate::cli::vm_config::parse_vm_args_or_error;
+use aelys_common::WarningConfig;
 use aelys_driver::run_file_with_config_and_opt;
 use aelys_modules::manifest::Manifest;
 use aelys_opt::OptimizationLevel;
@@ -14,6 +15,7 @@ pub fn run_with_options(
     program_args: Vec<String>,
     vm_args: Vec<String>,
     opt_level: OptimizationLevel,
+    _warn_config: WarningConfig,
 ) -> Result<i32, String> {
     let parsed = parse_vm_args_or_error(&vm_args)?;
     let config = parsed.config;
@@ -24,6 +26,7 @@ pub fn run_with_options(
         InputFormat::Bytecode => run_avbc_file(path_ref, config, program_args)?,
         InputFormat::Source => {
             ensure_utf8_source(path_ref)?;
+            // TODO: propagate warnings from optimizer through driver API
             run_file_with_config_and_opt(path_ref, config, program_args, opt_level)
                 .map_err(|err| err.to_string())?
         }

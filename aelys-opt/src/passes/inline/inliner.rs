@@ -1,7 +1,7 @@
 use super::analyze::{BlockReason, InlineDecision, ProgramAnalysis};
 use super::expand::InlineExpander;
-use super::warning::{InlineWarning, InlineWarningKind};
 use crate::passes::{OptimizationLevel, OptimizationPass, OptimizationStats};
+use aelys_common::{Warning, WarningKind};
 use aelys_sema::{TypedExpr, TypedExprKind, TypedFunction, TypedProgram, TypedStmt, TypedStmtKind};
 use std::collections::{HashMap, HashSet};
 
@@ -10,7 +10,7 @@ const BLOAT_BUDGET: f64 = 0.20;
 pub struct FunctionInliner {
     level: OptimizationLevel,
     stats: OptimizationStats,
-    warnings: Vec<InlineWarning>,
+    warnings: Vec<Warning>,
     warned_functions: HashSet<String>,
     functions: HashMap<String, TypedFunction>,
     expander: InlineExpander,
@@ -28,8 +28,12 @@ impl FunctionInliner {
         }
     }
 
-    pub fn warnings(&self) -> &[InlineWarning] {
+    pub fn warnings(&self) -> &[Warning] {
         &self.warnings
+    }
+
+    pub fn take_warnings(&mut self) -> Vec<Warning> {
+        std::mem::take(&mut self.warnings)
     }
 
     fn collect_functions(&mut self, program: &TypedProgram) {
@@ -178,23 +182,29 @@ impl FunctionInliner {
         }
 
         let kind = match reason {
-            BlockReason::Recursive => InlineWarningKind::RecursiveFunction,
-            BlockReason::MutualRecursion(cycle) => InlineWarningKind::MutualRecursion { cycle },
-            BlockReason::HasCaptures => InlineWarningKind::HasCaptures,
+            BlockReason::Recursive => WarningKind::InlineRecursive,
+            BlockReason::MutualRecursion(cycle) => WarningKind::InlineMutualRecursion { cycle },
+            BlockReason::HasCaptures => WarningKind::InlineHasCaptures,
             BlockReason::TooLarge { size, threshold } => {
-                InlineWarningKind::TooLarge { body_size: size, threshold }
+                WarningKind::InlineTooLarge { size, limit: threshold }
             }
         };
 
-        let warning = InlineWarning::new(kind, name.to_string(), func.span);
-
         let has_always = func.decorators.iter().any(|d| d.name == "inline_always");
-        if !warning.is_fatal() && has_always {
+
+        // @inline_always suppresses non-fatal warnings
+        let is_fatal = matches!(
+            kind,
+            WarningKind::InlineRecursive
+                | WarningKind::InlineMutualRecursion { .. }
+                | WarningKind::InlineNativeFunction
+        );
+        if !is_fatal && has_always {
             return;
         }
 
         self.warned_functions.insert(name.to_string());
-        eprintln!("{}", warning);
+        let warning = Warning::new(kind, func.span).with_context(name);
         self.warnings.push(warning);
     }
 }

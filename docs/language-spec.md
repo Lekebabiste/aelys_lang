@@ -590,7 +590,7 @@ The difference:
 | `@inline` | Hint to the compiler. Respects code size thresholds. |
 | `@inline_always` | Forces inlining. Ignores size limits. |
 
-`@inline` can be ignored if the function is too large or if inlining would bloat the binary too much. `@inline_always` forces substitution no matter what (except truly impossible cases)
+`@inline` can be ignored in some cases (recursive functions, mutual recursion). `@inline_always` forces substitution no matter what (except truly impossible cases like recursion)
 
 **When to use `@inline`:**
 
@@ -872,9 +872,8 @@ Here's some other inline warnings:
 
 - **W0102**: Mutual recursion (A calls B, B calls A)
 - **W0103**: Function captures variables from outer scope
-- **W0104**: Function body is too large for inlining
-- **W0105**: Public function is being inlined (original kept for external callers)
-- **W0106**: Native function can't be inlined
+- **W0104**: Public function is being inlined (original kept for external callers)
+- **W0105**: Native function can't be inlined
 
 ### Warning Flags
 

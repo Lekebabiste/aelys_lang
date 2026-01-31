@@ -2,7 +2,7 @@
 
 All notable changes to Aelys, roughly grouped by version. I don't always tag releases perfectly, so this is reconstructed from git history
 
-## 0.19.x - Array and Vec Implementations
+## 0.19.x - Array, Vec, and @inline decorator implementations
 **0.19.5-a**
 - New centralized warning system with `-W` flags (`-Wall`, `-Werror`, `-Wno-<category>`)
 - String interpolation with `{expression}` syntax

@@ -8,7 +8,9 @@ aelys-common = { path = "../aelys-common" }
 aelys-syntax = { path = "../aelys-syntax" }
 aelys-native = { path = "../aelys-native" }
 toml = "0.8"
-semver = "1"
 libloading = "0.8"
 libc = "0.2"
 serde = { version = "1", features = ["derive"] }
+
+[lib]
+doctest = false

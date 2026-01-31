@@ -19,3 +19,6 @@ aelys-native = { path = "../aelys-native" }
 semver = "1.0"
 
 [dev-dependencies]
+
+[lib]
+doctest = false

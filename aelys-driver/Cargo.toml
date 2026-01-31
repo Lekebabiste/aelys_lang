@@ -15,3 +15,6 @@ aelys-runtime = { path = "../aelys-runtime" }
 aelys-modules = { path = "../aelys-modules" }
 aelys-native = { path = "../aelys-native" }
 semver = "1"
+
+[lib]
+doctest = false

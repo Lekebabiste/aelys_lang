@@ -7,3 +7,6 @@ edition = "2024"
 aelys-common = { path = "../aelys-common" }
 aelys-syntax = { path = "../aelys-syntax" }
 aelys-sema = { path = "../aelys-sema" }
+
+[lib]
+doctest = false

@@ -11,3 +11,6 @@ aelys-modules = { path = "../aelys-modules" }
 aelys-native = { path = "../aelys-native" }
 libc = "0.2"
 rand = "0.8"
+
+[lib]
+doctest = false

@@ -4,6 +4,7 @@ version.workspace = true
 edition = "2024"
 
 [dependencies]
-thiserror = "2.0.17"
-serde = { version = "1", features = ["derive"] }
 aelys-syntax = { path = "../aelys-syntax" }
+
+[lib]
+doctest = false

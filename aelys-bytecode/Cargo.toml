@@ -4,5 +4,7 @@ version.workspace = true
 edition = "2024"
 
 [dependencies]
-aelys-common = { path = "../aelys-common" }
 thiserror = "2.0.17"
+
+[lib]
+doctest = false

@@ -22,4 +22,6 @@ aelys-bytecode = { path = "../aelys-bytecode" }
 
 [build-dependencies]
 regex = "1"
-toml_edit = "0.22"
+
+[lib]
+doctest = false

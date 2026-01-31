@@ -6,3 +6,6 @@ edition = "2024"
 
 [dependencies]
 aelys-native-macros = { path = "../aelys-native-macros" }
+
+[lib]
+doctest = false

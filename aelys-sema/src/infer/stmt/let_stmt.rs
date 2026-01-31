@@ -1,7 +1,6 @@
 use super::TypeInference;
 use crate::constraint::{Constraint, ConstraintReason};
 use crate::typed_ast::TypedStmtKind;
-use crate::types::InferType;
 use aelys_syntax::{Expr, Span, TypeAnnotation};
 
 impl TypeInference {
@@ -18,7 +17,7 @@ impl TypeInference {
 
         let declared_type = type_annotation
             .as_ref()
-            .map(|ann| InferType::from_annotation(ann));
+            .map(|ann| self.type_from_annotation(ann));
 
         let var_type = if let Some(decl) = &declared_type {
             self.constraints.push(Constraint::equal(

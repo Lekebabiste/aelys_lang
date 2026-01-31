@@ -7,9 +7,8 @@ impl WarningKind {
             Self::InlineRecursive => 101,
             Self::InlineMutualRecursion { .. } => 102,
             Self::InlineHasCaptures => 103,
-            Self::InlineTooLarge { .. } => 104,
-            Self::InlinePublicFunction => 105,
-            Self::InlineNativeFunction => 106,
+            Self::InlinePublicFunction => 104,
+            Self::InlineNativeFunction => 105,
 
             // unused: 200-299
             Self::UnusedVariable { .. } => 201,
@@ -21,6 +20,10 @@ impl WarningKind {
 
             // style: 400-499
             Self::ShadowedVariable { .. } => 401,
+
+            // type: 500-599
+            Self::UnknownType { .. } => 501,
+            Self::UnknownTypeParameter { .. } => 502,
         }
     }
 }

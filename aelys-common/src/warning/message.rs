@@ -21,13 +21,6 @@ impl WarningKind {
                 format!("function '{}' captures variables, inlining may change semantics", name)
             }
 
-            Self::InlineTooLarge { size, limit } => {
-                format!(
-                    "function '{}' is too large to inline ({} statements, limit is {})",
-                    name, size, limit
-                )
-            }
-
             Self::InlinePublicFunction => {
                 format!(
                     "inlining public function '{}', original will be kept for external callers",
@@ -58,6 +51,14 @@ impl WarningKind {
 
             Self::ShadowedVariable { name: var } => {
                 format!("variable '{}' shadows a previous binding", var)
+            }
+
+            Self::UnknownType { name: ty } => {
+                format!("unknown type '{}', treating as dynamic", ty)
+            }
+
+            Self::UnknownTypeParameter { param, in_type } => {
+                format!("unknown type parameter '{}' in {}<...>, treating as dynamic", param, in_type)
             }
         }
     }

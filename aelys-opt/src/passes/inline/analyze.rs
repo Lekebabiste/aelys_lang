@@ -99,16 +99,11 @@ impl ProgramAnalysis {
         }
 
         if aggressive {
-            // aggressive mode: allow more bloat
             let inline_cost = info.body_size * info.call_count;
             let budget = (self.total_size as f64 * bloat_budget).max(10.0) as usize;
             if inline_cost <= budget {
                 return InlineDecision::Inline;
             }
-            return InlineDecision::Blocked(BlockReason::TooLarge {
-                size: info.body_size,
-                threshold: budget / info.call_count.max(1),
-            });
         }
 
         InlineDecision::Skip
@@ -127,7 +122,6 @@ pub enum BlockReason {
     Recursive,
     MutualRecursion(Vec<String>),
     HasCaptures,
-    TooLarge { size: usize, threshold: usize },
 }
 
 fn analyze_function(func: &TypedFunction) -> FunctionInfo {

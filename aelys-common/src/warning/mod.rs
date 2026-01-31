@@ -86,7 +86,7 @@ impl WarningConfig {
             self.treat_as_error = true;
             Ok(())
         } else {
-            let valid = ["all", "inline", "unused", "deprecated", "shadow"];
+            let valid = ["all", "inline", "unused", "deprecated", "shadow", "type"];
             if valid.contains(&flag) {
                 self.enable(flag);
                 Ok(())

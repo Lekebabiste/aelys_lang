@@ -6,7 +6,6 @@ impl WarningKind {
             Self::InlineRecursive => "recursive call here",
             Self::InlineMutualRecursion { .. } => "part of mutual recursion",
             Self::InlineHasCaptures => "captures from outer scope",
-            Self::InlineTooLarge { .. } => "body exceeds size threshold",
             Self::InlinePublicFunction => "public function",
             Self::InlineNativeFunction => "native, no body to inline",
             Self::UnusedVariable { .. } => "never used",
@@ -14,6 +13,8 @@ impl WarningKind {
             Self::UnusedImport { .. } => "never used",
             Self::DeprecatedFunction { .. } => "deprecated",
             Self::ShadowedVariable { .. } => "shadows earlier binding",
+            Self::UnknownType { .. } => "unknown type name",
+            Self::UnknownTypeParameter { .. } => "unknown type parameter",
         }
     }
 
@@ -22,9 +23,6 @@ impl WarningKind {
             Self::InlineRecursive => Some("remove @inline from this function"),
             Self::InlineMutualRecursion { .. } => Some("break the cycle or remove @inline"),
             Self::InlineHasCaptures => Some("use @inline_always if this is intentional"),
-            Self::InlineTooLarge { .. } => {
-                Some("use @inline_always to force, or split into smaller functions")
-            }
             Self::InlinePublicFunction => None,
             Self::InlineNativeFunction => Some("remove @inline from this declaration"),
             Self::UnusedVariable { .. } => Some("prefix with _ to silence"),
@@ -32,6 +30,8 @@ impl WarningKind {
             Self::UnusedImport { .. } => Some("remove the import"),
             Self::DeprecatedFunction { .. } => None,
             Self::ShadowedVariable { .. } => Some("use a different name"),
+            Self::UnknownType { .. } => Some("use int, float, bool, string, array, or vec"),
+            Self::UnknownTypeParameter { .. } => Some("use a known type like int, float, string"),
         }
     }
 

@@ -6,7 +6,6 @@ pub enum WarningKind {
     InlineRecursive,
     InlineMutualRecursion { cycle: Vec<String> },
     InlineHasCaptures,
-    InlineTooLarge { size: usize, limit: usize },
     InlinePublicFunction,
     InlineNativeFunction,
 
@@ -20,6 +19,10 @@ pub enum WarningKind {
 
     // Style (W04xx)
     ShadowedVariable { name: String },
+
+    // Type-related (W05xx)
+    UnknownType { name: String },
+    UnknownTypeParameter { param: String, in_type: String },
 }
 
 impl WarningKind {
@@ -29,7 +32,6 @@ impl WarningKind {
             WarningKind::InlineRecursive
                 | WarningKind::InlineMutualRecursion { .. }
                 | WarningKind::InlineHasCaptures
-                | WarningKind::InlineTooLarge { .. }
                 | WarningKind::InlinePublicFunction
                 | WarningKind::InlineNativeFunction
         )
@@ -40,7 +42,6 @@ impl WarningKind {
             WarningKind::InlineRecursive
             | WarningKind::InlineMutualRecursion { .. }
             | WarningKind::InlineHasCaptures
-            | WarningKind::InlineTooLarge { .. }
             | WarningKind::InlinePublicFunction
             | WarningKind::InlineNativeFunction => "inline",
 
@@ -51,6 +52,9 @@ impl WarningKind {
             WarningKind::DeprecatedFunction { .. } => "deprecated",
 
             WarningKind::ShadowedVariable { .. } => "shadow",
+
+            WarningKind::UnknownType { .. }
+            | WarningKind::UnknownTypeParameter { .. } => "type",
         }
     }
 }

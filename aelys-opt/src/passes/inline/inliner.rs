@@ -185,9 +185,6 @@ impl FunctionInliner {
             BlockReason::Recursive => WarningKind::InlineRecursive,
             BlockReason::MutualRecursion(cycle) => WarningKind::InlineMutualRecursion { cycle },
             BlockReason::HasCaptures => WarningKind::InlineHasCaptures,
-            BlockReason::TooLarge { size, threshold } => {
-                WarningKind::InlineTooLarge { size, limit: threshold }
-            }
         };
 
         let has_always = func.decorators.iter().any(|d| d.name == "inline_always");

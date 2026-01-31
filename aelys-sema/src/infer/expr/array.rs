@@ -13,10 +13,12 @@ impl TypeInference {
     ) -> (TypedExprKind, InferType) {
         let typed_elements: Vec<TypedExpr> = elements.iter().map(|e| self.infer_expr(e)).collect();
 
-        let elem_ty = if let Some(ann) = element_type {
-            InferType::from_annotation(ann)
+        let (elem_ty, resolved_elem) = if let Some(ann) = element_type {
+            let ty = self.type_from_annotation(ann);
+            let resolved = ResolvedType::from_infer_type(&ty);
+            (ty, Some(resolved))
         } else if typed_elements.is_empty() {
-            self.type_gen.fresh()
+            (self.type_gen.fresh(), None)
         } else {
             let first_ty = typed_elements[0].ty.clone();
             for elem in typed_elements.iter().skip(1) {
@@ -27,12 +29,8 @@ impl TypeInference {
                     ConstraintReason::ArrayElement,
                 ));
             }
-            first_ty
+            (first_ty, None)
         };
-
-        let resolved_elem = element_type.as_ref().map(|ann| {
-            ResolvedType::from_infer_type(&InferType::from_annotation(ann))
-        });
 
         (
             TypedExprKind::ArrayLiteral {
@@ -51,7 +49,6 @@ impl TypeInference {
     ) -> (TypedExprKind, InferType) {
         let typed_size = self.infer_expr(size);
 
-        // Size must be an integer
         self.constraints.push(Constraint::equal(
             typed_size.ty.clone(),
             InferType::Int,
@@ -59,17 +56,13 @@ impl TypeInference {
             ConstraintReason::ArrayIndex,
         ));
 
-        // Element type: from annotation or fresh type variable
-        let elem_ty = if let Some(ann) = element_type {
-            InferType::from_annotation(ann)
+        let (elem_ty, resolved_elem) = if let Some(ann) = element_type {
+            let ty = self.type_from_annotation(ann);
+            let resolved = ResolvedType::from_infer_type(&ty);
+            (ty, Some(resolved))
         } else {
-            // Default to Dynamic for untyped sized arrays
-            InferType::Dynamic
+            (InferType::Dynamic, None)
         };
-
-        let resolved_elem = element_type.as_ref().map(|ann| {
-            ResolvedType::from_infer_type(&InferType::from_annotation(ann))
-        });
 
         (
             TypedExprKind::ArraySized {
@@ -88,10 +81,12 @@ impl TypeInference {
     ) -> (TypedExprKind, InferType) {
         let typed_elements: Vec<TypedExpr> = elements.iter().map(|e| self.infer_expr(e)).collect();
 
-        let elem_ty = if let Some(ann) = element_type {
-            InferType::from_annotation(ann)
+        let (elem_ty, resolved_elem) = if let Some(ann) = element_type {
+            let ty = self.type_from_annotation(ann);
+            let resolved = ResolvedType::from_infer_type(&ty);
+            (ty, Some(resolved))
         } else if typed_elements.is_empty() {
-            self.type_gen.fresh()
+            (self.type_gen.fresh(), None)
         } else {
             let first_ty = typed_elements[0].ty.clone();
             for elem in typed_elements.iter().skip(1) {
@@ -102,12 +97,8 @@ impl TypeInference {
                     ConstraintReason::ArrayElement,
                 ));
             }
-            first_ty
+            (first_ty, None)
         };
-
-        let resolved_elem = element_type.as_ref().map(|ann| {
-            ResolvedType::from_infer_type(&InferType::from_annotation(ann))
-        });
 
         (
             TypedExprKind::VecLiteral {

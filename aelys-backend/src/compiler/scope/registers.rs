@@ -63,6 +63,18 @@ impl Compiler {
             .into());
         }
 
+        // Safety check: verify none of the registers are already in use
+        for i in start_usize..end_usize {
+            if self.register_pool[i] {
+                return Err(CompileError::new(
+                    CompileErrorKind::TooManyRegisters,
+                    Span::dummy(),
+                    self.source.clone(),
+                )
+                .into());
+            }
+        }
+
         for i in start_usize..end_usize {
             self.register_pool[i] = true;
         }

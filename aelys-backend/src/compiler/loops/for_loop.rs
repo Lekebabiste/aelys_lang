@@ -1,7 +1,6 @@
 use super::super::{Compiler, LoopContext};
 use aelys_bytecode::OpCode;
 use aelys_common::Result;
-use aelys_common::error::{CompileError, CompileErrorKind};
 use aelys_syntax::Span;
 use aelys_syntax::ast::{Expr, ExprKind, Stmt};
 
@@ -42,25 +41,25 @@ impl Compiler {
         };
 
         self.begin_scope();
-        let iter_reg = self.declare_variable(iterator, false)?;
+
+        // Allocate 3 consecutive registers for iter, end, step.
+        // ForLoopI requires these to be adjacent in the register window.
+        let iter_reg = self.alloc_consecutive_registers_for_call(3, span)?;
+        let end_reg = iter_reg + 1;
+        let step_reg = iter_reg + 2;
+
+        self.register_pool[iter_reg as usize] = true;
+        self.register_pool[end_reg as usize] = true;
+        self.register_pool[step_reg as usize] = true;
+        self.next_register = self.next_register.max(step_reg + 1);
+
+        self.add_local(
+            iterator.to_string(),
+            false,
+            iter_reg,
+            aelys_sema::ResolvedType::Dynamic,
+        );
         self.loop_variables.push(iterator.to_string());
-
-        let end_reg = iter_reg.checked_add(1).ok_or_else(|| {
-            CompileError::new(
-                CompileErrorKind::TooManyRegisters,
-                span,
-                self.source.clone(),
-            )
-        })?;
-        let step_reg = iter_reg.checked_add(2).ok_or_else(|| {
-            CompileError::new(
-                CompileErrorKind::TooManyRegisters,
-                span,
-                self.source.clone(),
-            )
-        })?;
-
-        self.alloc_consecutive_from(end_reg, 2)?; // end + step, must be adjacent
 
         self.compile_expr(start, iter_reg)?;
         self.compile_expr(end, end_reg)?;

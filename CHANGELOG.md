@@ -6,6 +6,7 @@ All notable changes to Aelys, roughly grouped by version. I don't always tag rel
 **0.19.5-a**
 - New centralized warning system with `-W` flags (`-Wall`, `-Werror`, `-Wno-<category>`)
 - String interpolation with `{expression}` syntax
+- Fixed for-loop register allocation bugs that could cause incorrect variable values or GC collecting live objects
 
 **0.19.4-a**
 - Added `@inline` and `@inline_always` decorators

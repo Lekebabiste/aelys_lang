@@ -419,3 +419,353 @@ if r >= -1.0 and r <= 1.0 { 1 } else { 0 }
 "#;
     assert_aelys_int(code, 1);
 }
+
+#[test]
+fn variable_in_function_accessed_in_for_loop() {
+    let code = r#"
+fn foo() {
+    let x = 42
+    let mut sum = 0
+    for i in 0..5 {
+        sum = sum + x
+    }
+    return sum
+}
+foo()
+"#;
+    assert_aelys_int(code, 210);
+}
+
+#[test]
+fn multiple_variables_in_function_accessed_in_for_loop() {
+    let code = r#"
+fn foo() {
+    let a = 10
+    let b = 20
+    let c = 30
+    let mut sum = 0
+    for i in 0..3 {
+        sum = sum + a + b + c
+    }
+    return sum
+}
+foo()
+"#;
+    assert_aelys_int(code, 180);
+}
+
+#[test]
+fn variable_in_function_accessed_in_while_loop() {
+    let code = r#"
+fn foo() {
+    let x = 42
+    let mut sum = 0
+    let mut i = 0
+    while i < 5 {
+        sum = sum + x
+        i = i + 1
+    }
+    return sum
+}
+foo()
+"#;
+    assert_aelys_int(code, 210);
+}
+
+#[test]
+fn variable_in_function_nested_for_loops() {
+    let code = r#"
+fn foo() {
+    let x = 1
+    let mut count = 0
+    for i in 0..5 {
+        for j in 0..5 {
+            count = count + x
+        }
+    }
+    return count
+}
+foo()
+"#;
+    assert_aelys_int(code, 25);
+}
+
+#[test]
+fn string_variable_in_function_for_loop() {
+    let code = r#"
+needs std.string
+fn foo() {
+    let prefix = "hello"
+    let mut count = 0
+    for i in 0..3 {
+        let len = string.len(prefix)
+        if len > 0 {
+            count = count + 1
+        }
+    }
+    return count
+}
+foo()
+"#;
+    assert_aelys_int(code, 3);
+}
+
+#[test]
+fn variable_defined_before_function_used_in_loop_via_closure() {
+    let code = r#"
+fn make_adder(x) {
+    return fn(y) { return x + y }
+}
+let adder = make_adder(10)
+let mut sum = 0
+for i in 0..5 {
+    sum = sum + adder(i)
+}
+sum
+"#;
+    assert_aelys_int(code, 60);
+}
+
+#[test]
+fn for_loop_register_collision_stress() {
+    let code = r#"
+fn test() {
+    let a = 1
+    let b = 2
+    let c = 3
+    let d = 4
+    let e = 5
+    let mut total = 0
+    for i in 0..10 {
+        total = total + a + b + c + d + e
+    }
+    return total
+}
+test()
+"#;
+    assert_aelys_int(code, 150);
+}
+
+// Parameter accessed in for loop
+#[test]
+fn parameter_accessed_in_for_loop() {
+    let code = r#"
+fn foo(x) {
+    let mut sum = 0
+    for i in 0..5 {
+        sum = sum + x
+    }
+    return sum
+}
+foo(42)
+"#;
+    assert_aelys_int(code, 210);
+}
+
+// Closure captures variable used in for loop
+#[test]
+fn closure_captures_and_for_loop() {
+    let code = r#"
+fn make_value() {
+    let x = 42
+    fn inner() {
+        return x
+    }
+    let mut sum = 0
+    for i in 0..5 {
+        sum = sum + inner()
+    }
+    return sum
+}
+make_value()
+"#;
+    assert_aelys_int(code, 210);
+}
+
+// Global variable accessed in function's for loop
+#[test]
+fn global_var_in_function_for_loop() {
+    let code = r#"
+let x = 42
+fn foo() {
+    let mut sum = 0
+    for i in 0..5 {
+        sum = sum + x
+    }
+    return sum
+}
+foo()
+"#;
+    assert_aelys_int(code, 210);
+}
+
+// Variable in nested scope before for loop
+#[test]
+fn nested_scope_before_for_loop() {
+    let code = r#"
+fn foo() {
+    let x = 42
+    {
+        let tmp = x + 1
+    }
+    let mut sum = 0
+    for i in 0..5 {
+        sum = sum + x
+    }
+    return sum
+}
+foo()
+"#;
+    assert_aelys_int(code, 210);
+}
+
+// Variable shadowed in nested scope then used in for loop
+#[test]
+fn variable_used_after_inner_scope_in_for_loop() {
+    let code = r#"
+fn foo() {
+    let x = 10
+    let y = 20
+    {
+        let x = 100
+        let z = x + y
+    }
+    let mut sum = 0
+    for i in 0..3 {
+        sum = sum + x + y
+    }
+    return sum
+}
+foo()
+"#;
+    assert_aelys_int(code, 90);
+}
+
+// Function call inside for loop
+#[test]
+fn function_call_inside_for_loop() {
+    let code = r#"
+fn double(n) {
+    return n * 2
+}
+fn test() {
+    let mut sum = 0
+    for i in 0..5 {
+        sum = sum + double(i)
+    }
+    return sum
+}
+test()
+"#;
+    assert_aelys_int(code, 20);
+}
+
+// Multiple for loops in sequence
+#[test]
+fn multiple_for_loops_same_function() {
+    let code = r#"
+fn test() {
+    let x = 10
+    let mut sum = 0
+    for i in 0..5 {
+        sum = sum + x
+    }
+    for j in 0..3 {
+        sum = sum + x
+    }
+    return sum
+}
+test()
+"#;
+    assert_aelys_int(code, 80);
+}
+
+// Mutable variable modified both inside and outside for loop
+#[test]
+fn mutable_var_modified_in_and_out_of_for_loop() {
+    let code = r#"
+fn test() {
+    let mut x = 0
+    x = 5
+    for i in 0..3 {
+        x = x + 1
+    }
+    return x
+}
+test()
+"#;
+    assert_aelys_int(code, 8);
+}
+
+// String concat in for loop (GC stress with heap objects)
+#[test]
+fn string_concat_in_for_loop_function() {
+    let code = r#"
+needs std.string
+fn test() {
+    let mut s = ""
+    for i in 0..5 {
+        s = s + "x"
+    }
+    return string.len(s)
+}
+test()
+"#;
+    assert_aelys_int(code, 5);
+}
+
+// For loop with variable-based range
+#[test]
+fn for_loop_with_variable_range() {
+    let code = r#"
+fn test() {
+    let start = 0
+    let end_val = 5
+    let x = 10
+    let mut sum = 0
+    for i in start..end_val {
+        sum = sum + x + i
+    }
+    return sum
+}
+test()
+"#;
+    assert_aelys_int(code, 60);
+}
+
+// Nested function with for loop accessing outer vars via closure
+#[test]
+fn nested_fn_with_for_loop_closure() {
+    let code = r#"
+fn outer() {
+    let x = 10
+    fn inner() {
+        let mut sum = 0
+        for i in 0..5 {
+            sum = sum + x
+        }
+        return sum
+    }
+    return inner()
+}
+outer()
+"#;
+    assert_aelys_int(code, 50);
+}
+
+// Lambda inside for loop capturing loop variable
+#[test]
+fn lambda_inside_for_loop() {
+    let code = r#"
+fn test() {
+    let mut sum = 0
+    for i in 0..5 {
+        let f = fn() { return i }
+        sum = sum + f()
+    }
+    return sum
+}
+test()
+"#;
+    assert_aelys_int(code, 10);
+}

@@ -66,6 +66,7 @@ impl Compiler {
         self.register_pool[iter_reg as usize] = true;
         self.register_pool[end_reg as usize] = true;
         self.register_pool[step_reg as usize] = true;
+        self.next_register = self.next_register.max(step_reg + 1);
 
         self.compile_typed_expr(start, iter_reg)?;
         self.compile_typed_expr(end, end_reg)?;

@@ -104,8 +104,41 @@ impl Compiler {
         dest: u8,
         span: Span,
     ) -> Result<()> {
-        self.compile_typed_expr(expr, dest)?;
-        self.emit_typed_tostring_call(dest, span)
+        // CallGlobalNative reads args from dest+1, so compile the expression there.
+        let arg_reg = dest + 1;
+
+        if (arg_reg as usize) < self.register_pool.len()
+            && !self.register_pool[arg_reg as usize]
+        {
+            // fast path: dest+1 is free
+            self.register_pool[arg_reg as usize] = true;
+            self.next_register = self.next_register.max(arg_reg + 1);
+
+            self.compile_typed_expr(expr, arg_reg)?;
+            self.emit_typed_tostring_call(dest, span)?;
+
+            self.register_pool[arg_reg as usize] = false;
+        } else {
+            // slow path: dest+1 is occupied, use a fresh consecutive pair
+            let call_base = self.alloc_consecutive_registers_for_call(2, span)?;
+            let call_arg = call_base + 1;
+
+            self.register_pool[call_base as usize] = true;
+            self.register_pool[call_arg as usize] = true;
+            self.next_register = self.next_register.max(call_arg + 1);
+
+            self.compile_typed_expr(expr, call_arg)?;
+            self.emit_typed_tostring_call(call_base, span)?;
+
+            if call_base != dest {
+                self.emit_a(OpCode::Move, dest, call_base, 0, span);
+            }
+
+            self.register_pool[call_arg as usize] = false;
+            self.register_pool[call_base as usize] = false;
+        }
+
+        Ok(())
     }
 
     fn emit_typed_tostring_call(&mut self, reg: u8, span: Span) -> Result<()> {

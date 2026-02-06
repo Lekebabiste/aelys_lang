@@ -753,6 +753,48 @@ outer()
     assert_aelys_int(code, 50);
 }
 
+// String interpolation with for-loop iterator, the original bug report by Selofaney
+#[test]
+fn string_interpolation_for_loop_variable() {
+    let code = r#"
+fn test() {
+    let mut result = ""
+    for i in 0..3 {
+        result = "last={i}"
+    }
+    return result
+}
+test()
+"#;
+    assert_aelys_str(code, "last=2");
+}
+
+#[test]
+fn string_interpolation_variable_in_loop() {
+    let code = r#"
+fn test() {
+    let x = 42
+    let mut s = ""
+    for i in 0..1 {
+        s = "x={x}"
+    }
+    return s
+}
+test()
+"#;
+    assert_aelys_str(code, "x=42");
+}
+
+#[test]
+fn string_interpolation_multiple_vars() {
+    let code = r#"
+let a = 10
+let b = 20
+"{a}+{b}"
+"#;
+    assert_aelys_str(code, "10+20");
+}
+
 // Lambda inside for loop capturing loop variable
 #[test]
 fn lambda_inside_for_loop() {

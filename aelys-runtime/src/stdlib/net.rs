@@ -23,6 +23,7 @@ pub fn register(vm: &mut VM) -> Result<StdModuleExports, RuntimeError> {
     }
 
     reg_fn!("connect", 2, native_connect);
+    reg_fn!("connect_timeout", 3, native_connect_timeout);
     reg_fn!("send", 2, native_send);
     reg_fn!("recv", 1, native_recv);
     reg_fn!("recv_bytes", 2, native_recv_bytes);
@@ -79,6 +80,54 @@ fn native_connect(vm: &mut VM, args: &[Value]) -> Result<Value, RuntimeError> {
 
     // Try to connect with timeout
     let stream = match TcpStream::connect_timeout(&addrs[0], Duration::from_secs(30)) {
+        Ok(s) => s,
+        Err(_) => return Ok(Value::null()),
+    };
+
+    let resource = TcpStreamResource {
+        stream,
+        timeout_ms: None,
+    };
+
+    let handle = vm.store_resource(Resource::TcpStream(resource));
+    Ok(Value::int(handle as i64))
+}
+
+/// connect_timeout(host, port, ms) - Connect to a TCP server with a custom timeout in milliseconds.
+/// Returns a socket handle, or null on failure.
+fn native_connect_timeout(vm: &mut VM, args: &[Value]) -> Result<Value, RuntimeError> {
+    let host = get_string(vm, args[0], "net.connect_timeout")?;
+    let port = get_int(vm, args[1], "net.connect_timeout")?;
+    let timeout_ms = get_int(vm, args[2], "net.connect_timeout")?;
+
+    if port < 0 || port > 65535 {
+        return Err(net_error(
+            vm,
+            "net.connect_timeout",
+            format!("invalid port number: {}", port),
+        ));
+    }
+
+    if timeout_ms <= 0 {
+        return Err(net_error(
+            vm,
+            "net.connect_timeout",
+            "timeout must be positive".to_string(),
+        ));
+    }
+
+    let addr = format!("{}:{}", host, port);
+
+    let addrs: Vec<_> = match addr.to_socket_addrs() {
+        Ok(iter) => iter.collect(),
+        Err(_) => return Ok(Value::null()),
+    };
+
+    if addrs.is_empty() {
+        return Ok(Value::null());
+    }
+
+    let stream = match TcpStream::connect_timeout(&addrs[0], Duration::from_millis(timeout_ms as u64)) {
         Ok(s) => s,
         Err(_) => return Ok(Value::null()),
     };
